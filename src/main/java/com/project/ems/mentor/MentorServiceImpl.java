@@ -2,6 +2,8 @@ package com.project.ems.mentor;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,39 +11,50 @@ import org.springframework.stereotype.Service;
 public class MentorServiceImpl implements MentorService {
 
     private final MentorRepository mentorRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    public List<Mentor> getAllMentors() {
-        return mentorRepository.findAll();
+    public List<MentorDto> getAllMentors() {
+        List<Mentor> mentors = mentorRepository.findAll();
+        return modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {}.getType());
     }
 
     @Override
-    public Mentor getMentorById(Long id) {
-        return mentorRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Mentor with id %s not found", id)));
+    public MentorDto getMentorById(Long id) {
+        Mentor mentor = getMentorEntityById(id);
+        return modelMapper.map(mentor, MentorDto.class);
     }
 
     @Override
-    public Mentor saveMentor(Mentor mentor) {
-        return mentorRepository.save(mentor);
+    public MentorDto saveMentor(MentorDto mentorDto) {
+        Mentor mentor = modelMapper.map(mentorDto, Mentor.class);
+        Mentor savedMentor = mentorRepository.save(mentor);
+        return modelMapper.map(savedMentor, MentorDto.class);
     }
 
     @Override
-    public Mentor updateMentorById(Mentor mentor, Long id) {
-        Mentor updatedMentor = getMentorById(id);
-        updatedMentor.setName(mentor.getName());
-        updatedMentor.setEmail(mentor.getEmail());
-        updatedMentor.setPassword(mentor.getPassword());
-        updatedMentor.setMobile(mentor.getMobile());
-        updatedMentor.setAddress(mentor.getAddress());
-        updatedMentor.setBirthday(mentor.getBirthday());
-        updatedMentor.setIsAvailable(mentor.getIsAvailable());
-        updatedMentor.setNumberOfEmployees(mentor.getNumberOfEmployees());
-        return mentorRepository.save(updatedMentor);
+    public MentorDto updateMentorById(MentorDto mentorDto, Long id) {
+        Mentor mentor = getMentorEntityById(id);
+        mentor.setName(mentorDto.getName());
+        mentor.setEmail(mentorDto.getEmail());
+        mentor.setPassword(mentorDto.getPassword());
+        mentor.setMobile(mentorDto.getMobile());
+        mentor.setAddress(mentorDto.getAddress());
+        mentor.setBirthday(mentorDto.getBirthday());
+        mentor.setIsAvailable(mentorDto.getIsAvailable());
+        mentor.setNumberOfEmployees(mentorDto.getNumberOfEmployees());
+        Mentor updatedMentor = mentorRepository.save(mentor);
+        return modelMapper.map(updatedMentor, MentorDto.class);
     }
 
     @Override
     public void deleteMentorById(Long id) {
-        Mentor mentor = getMentorById(id);
+        Mentor mentor = getMentorEntityById(id);
         mentorRepository.delete(mentor);
+    }
+
+    @Override
+    public Mentor getMentorEntityById(Long id) {
+        return mentorRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Mentor with id %s not found", id)));
     }
 }

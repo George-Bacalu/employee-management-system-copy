@@ -21,23 +21,23 @@ public class MentorRestController {
     private final MentorService mentorService;
 
     @GetMapping
-    public ResponseEntity<List<Mentor>> getAllMentors() {
+    public ResponseEntity<List<MentorDto>> getAllMentors() {
         return ResponseEntity.ok(mentorService.getAllMentors());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Mentor> getMentorById(@PathVariable Long id) {
+    public ResponseEntity<MentorDto> getMentorById(@PathVariable Long id) {
         return ResponseEntity.ok(mentorService.getMentorById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Mentor> saveMentor(@RequestBody Mentor mentor) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(mentorService.saveMentor(mentor));
+    public ResponseEntity<MentorDto> saveMentor(@RequestBody MentorDto mentorDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(mentorService.saveMentor(mentorDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Mentor> updateMentorById(@RequestBody Mentor mentor, @PathVariable Long id) {
-        return ResponseEntity.ok(mentorService.updateMentorById(mentor, id));
+    public ResponseEntity<MentorDto> updateMentorById(@RequestBody MentorDto mentorDto, @PathVariable Long id) {
+        return ResponseEntity.ok(mentorService.updateMentorById(mentorDto, id));
     }
 
     @DeleteMapping("/{id}")

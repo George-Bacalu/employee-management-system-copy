@@ -21,23 +21,23 @@ public class ExperienceRestController {
     private final ExperienceService experienceService;
 
     @GetMapping
-    public ResponseEntity<List<Experience>> getAllExperiences() {
+    public ResponseEntity<List<ExperienceDto>> getAllExperiences() {
         return ResponseEntity.ok(experienceService.getAllExperiences());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Experience> getExperienceById(@PathVariable Long id) {
+    public ResponseEntity<ExperienceDto> getExperienceById(@PathVariable Long id) {
         return ResponseEntity.ok(experienceService.getExperienceById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Experience> saveExperience(@RequestBody Experience experience) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(experienceService.saveExperience(experience));
+    public ResponseEntity<ExperienceDto> saveExperience(@RequestBody ExperienceDto experienceDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(experienceService.saveExperience(experienceDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Experience> updateExperienceById(@RequestBody Experience experience, @PathVariable Long id) {
-        return ResponseEntity.ok(experienceService.updateExperienceById(experience, id));
+    public ResponseEntity<ExperienceDto> updateExperienceById(@RequestBody ExperienceDto experienceDto, @PathVariable Long id) {
+        return ResponseEntity.ok(experienceService.updateExperienceById(experienceDto, id));
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,8 @@ import com.project.ems.mentor.MentorService;
 import com.project.ems.studies.StudiesService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,51 +15,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final MentorService mentorService;
     private final StudiesService studiesService;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<EmployeeDto> getAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
-        return employees.stream().map(employee -> EmployeeDto.builder()
-              .id(employee.getId())
-              .name(employee.getName())
-              .email(employee.getEmail())
-              .password(employee.getPassword())
-              .mobile(employee.getMobile())
-              .address(employee.getAddress())
-              .birthday(employee.getBirthday())
-              .jobType(employee.getJobType())
-              .position(employee.getPosition())
-              .grade(employee.getGrade())
-              .mentorId(employee.getMentor().getId())
-              .studiesId(employee.getStudies().getId())
-              .experiences(employee.getExperiences())
-              .build()).toList();
+        return modelMapper.map(employees, new TypeToken<List<EmployeeDto>>() {}.getType());
     }
 
     @Override
     public EmployeeDto getEmployeeById(Long id) {
         Employee employee = getEmployeeEntityById(id);
-        return getEmployeeDtoFromEntity(employee);
+        return modelMapper.map(employee, EmployeeDto.class);
     }
 
     @Override
     public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
-        Employee savedEmployee = employeeRepository.save(Employee.builder()
-              .id(employeeDto.getId())
-              .name(employeeDto.getName())
-              .email(employeeDto.getEmail())
-              .password(employeeDto.getPassword())
-              .mobile(employeeDto.getMobile())
-              .address(employeeDto.getAddress())
-              .birthday(employeeDto.getBirthday())
-              .jobType(employeeDto.getJobType())
-              .position(employeeDto.getPosition())
-              .grade(employeeDto.getGrade())
-              .mentor(mentorService.getMentorById(employeeDto.getMentorId()))
-              .studies(studiesService.getStudiesById(employeeDto.getStudiesId()))
-              .experiences(employeeDto.getExperiences())
-              .build());
-        return getEmployeeDtoFromEntity(savedEmployee);
+        Employee employee = modelMapper.map(employeeDto, Employee.class);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return modelMapper.map(savedEmployee, EmployeeDto.class);
     }
 
     @Override
@@ -72,11 +48,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setJobType(employeeDto.getJobType());
         employee.setPosition(employeeDto.getPosition());
         employee.setGrade(employeeDto.getGrade());
-        employee.setMentor(mentorService.getMentorById(employeeDto.getMentorId()));
-        employee.setStudies(studiesService.getStudiesById(employeeDto.getStudiesId()));
+        employee.setMentor(mentorService.getMentorEntityById(employeeDto.getMentorId()));
+        employee.setStudies(studiesService.getStudiesEntityById(employeeDto.getStudiesId()));
         employee.setExperiences(employeeDto.getExperiences());
         Employee updatedEmployee = employeeRepository.save(employee);
-        return getEmployeeDtoFromEntity(updatedEmployee);
+        return modelMapper.map(updatedEmployee, EmployeeDto.class);
     }
 
     @Override
@@ -85,25 +61,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.delete(employee);
     }
 
-    private Employee getEmployeeEntityById(Long id) {
+    @Override
+    public Employee getEmployeeEntityById(Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Employee with id %s not found", id)));
-    }
-
-    private EmployeeDto getEmployeeDtoFromEntity(Employee employee) {
-        return EmployeeDto.builder()
-              .id(employee.getId())
-              .name(employee.getName())
-              .email(employee.getEmail())
-              .password(employee.getPassword())
-              .mobile(employee.getMobile())
-              .address(employee.getAddress())
-              .birthday(employee.getBirthday())
-              .jobType(employee.getJobType())
-              .position(employee.getPosition())
-              .grade(employee.getGrade())
-              .mentorId(employee.getMentor().getId())
-              .studiesId(employee.getStudies().getId())
-              .experiences(employee.getExperiences())
-              .build();
     }
 }

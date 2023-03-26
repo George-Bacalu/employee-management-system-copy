@@ -1,7 +1,10 @@
 package com.project.ems.feedback;
 
+import com.project.ems.user.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,35 +12,47 @@ import org.springframework.stereotype.Service;
 public class FeedbackServiceImpl implements FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
+    private final UserService userService;
+    private final ModelMapper modelMapper;
 
     @Override
-    public List<Feedback> getAllFeedbacks() {
-        return feedbackRepository.findAll();
+    public List<FeedbackDto> getAllFeedbacks() {
+        List<Feedback> feedbacks = feedbackRepository.findAll();
+        return modelMapper.map(feedbacks, new TypeToken<List<FeedbackDto>>() {}.getType());
     }
 
     @Override
-    public Feedback getFeedbackById(Long id) {
-        return feedbackRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Feedback with id %s not found", id)));
+    public FeedbackDto getFeedbackById(Long id) {
+        Feedback feedback = getFeedbackEntityById(id);
+        return modelMapper.map(feedback, FeedbackDto.class);
     }
 
     @Override
-    public Feedback saveFeedback(Feedback feedback) {
-        return feedbackRepository.save(feedback);
+    public FeedbackDto saveFeedback(FeedbackDto feedbackDto) {
+        Feedback feedback = modelMapper.map(feedbackDto, Feedback.class);
+        Feedback savedFeedback = feedbackRepository.save(feedback);
+        return modelMapper.map(savedFeedback, FeedbackDto.class);
     }
 
     @Override
-    public Feedback updateFeedbackById(Feedback feedback, Long id) {
-        Feedback updatedFeedback = getFeedbackById(id);
-        updatedFeedback.setFeedbackType(feedback.getFeedbackType());
-        updatedFeedback.setDescription(feedback.getDescription());
-        updatedFeedback.setSentAt(feedback.getSentAt());
-        updatedFeedback.setUser(feedback.getUser());
-        return feedbackRepository.save(updatedFeedback);
+    public FeedbackDto updateFeedbackById(FeedbackDto feedbackDto, Long id) {
+        Feedback feedback = getFeedbackEntityById(id);
+        feedback.setFeedbackType(feedbackDto.getFeedbackType());
+        feedback.setDescription(feedbackDto.getDescription());
+        feedback.setSentAt(feedbackDto.getSentAt());
+        feedback.setUser(userService.getUserEntityById(feedbackDto.getUserId()));
+        Feedback updatedFeedback = feedbackRepository.save(feedback);
+        return modelMapper.map(updatedFeedback, FeedbackDto.class);
     }
 
     @Override
     public void deleteFeedbackById(Long id) {
-        Feedback feedback = getFeedbackById(id);
+        Feedback feedback = getFeedbackEntityById(id);
         feedbackRepository.delete(feedback);
+    }
+
+    @Override
+    public Feedback getFeedbackEntityById(Long id) {
+        return feedbackRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Feedback with id %s not found", id)));
     }
 }

@@ -21,23 +21,23 @@ public class UserRestController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PostMapping
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(user));
+    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(userDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUserById(@RequestBody User user, @PathVariable Long id) {
-        return ResponseEntity.ok(userService.updateUserById(user, id));
+    public ResponseEntity<UserDto> updateUserById(@RequestBody UserDto userDto, @PathVariable Long id) {
+        return ResponseEntity.ok(userService.updateUserById(userDto, id));
     }
 
     @DeleteMapping("/{id}")

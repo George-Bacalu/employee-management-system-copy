@@ -21,23 +21,23 @@ public class RoleRestController {
     private final RoleService roleService;
 
     @GetMapping
-    public ResponseEntity<List<Role>> getAllRoles() {
+    public ResponseEntity<List<RoleDto>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
+    public ResponseEntity<RoleDto> getRoleById(@PathVariable Long id) {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Role> saveRole(@RequestBody Role role) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(roleService.saveRole(role));
+    public ResponseEntity<RoleDto> saveRole(@RequestBody RoleDto roleDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(roleService.saveRole(roleDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Role> updateRoleById(@RequestBody Role role, @PathVariable Long id) {
-        return ResponseEntity.ok(roleService.updateRoleById(role, id));
+    public ResponseEntity<RoleDto> updateRoleById(@RequestBody RoleDto roleDto, @PathVariable Long id) {
+        return ResponseEntity.ok(roleService.updateRoleById(roleDto, id));
     }
 
     @DeleteMapping("/{id}")

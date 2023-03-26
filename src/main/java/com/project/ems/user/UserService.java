@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface UserService {
 
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers();
 
-    User getUserById(Long id);
+    UserDto getUserById(Long id);
 
-    User saveUser(User user);
+    UserDto saveUser(UserDto userDto);
 
-    User updateUserById(User user, Long id);
+    UserDto updateUserById(UserDto userDto, Long id);
 
     void deleteUserById(Long id);
+
+    User getUserEntityById(Long id);
 }

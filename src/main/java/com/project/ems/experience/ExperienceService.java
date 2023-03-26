@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface ExperienceService {
 
-    List<Experience> getAllExperiences();
+    List<ExperienceDto> getAllExperiences();
 
-    Experience getExperienceById(Long id);
+    ExperienceDto getExperienceById(Long id);
 
-    Experience saveExperience(Experience experience);
+    ExperienceDto saveExperience(ExperienceDto experienceDto);
 
-    Experience updateExperienceById(Experience experience, Long id);
+    ExperienceDto updateExperienceById(ExperienceDto experienceDto, Long id);
 
     void deleteExperienceById(Long id);
+
+    Experience getExperienceEntityById(Long id);
 }

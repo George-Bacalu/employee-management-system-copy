@@ -21,23 +21,23 @@ public class StudiesRestController {
     private final StudiesService studiesService;
 
     @GetMapping
-    public ResponseEntity<List<Studies>> getAllStudies() {
+    public ResponseEntity<List<StudiesDto>> getAllStudies() {
         return ResponseEntity.ok(studiesService.getAllStudies());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Studies> getStudiesById(@PathVariable Long id) {
+    public ResponseEntity<StudiesDto> getStudiesById(@PathVariable Long id) {
         return ResponseEntity.ok(studiesService.getStudiesById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Studies> saveStudies(@RequestBody Studies studies) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(studiesService.saveStudies(studies));
+    public ResponseEntity<StudiesDto> saveStudies(@RequestBody StudiesDto studiesDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(studiesService.saveStudies(studiesDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Studies> updateStudiesById(@RequestBody Studies studies, @PathVariable Long id) {
-        return ResponseEntity.ok(studiesService.updateStudiesById(studies, id));
+    public ResponseEntity<StudiesDto> updateStudiesById(@RequestBody StudiesDto studiesDto, @PathVariable Long id) {
+        return ResponseEntity.ok(studiesService.updateStudiesById(studiesDto, id));
     }
 
     @DeleteMapping("/{id}")

@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface RoleService {
 
-    List<Role> getAllRoles();
+    List<RoleDto> getAllRoles();
 
-    Role getRoleById(Long id);
+    RoleDto getRoleById(Long id);
 
-    Role saveRole(Role role);
+    RoleDto saveRole(RoleDto roleDto);
 
-    Role updateRoleById(Role role, Long id);
+    RoleDto updateRoleById(RoleDto roleDto, Long id);
 
     void deleteRoleById(Long id);
+
+    Role getRoleEntityById(Long id);
 }

@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface StudiesService {
 
-    List<Studies> getAllStudies();
+    List<StudiesDto> getAllStudies();
 
-    Studies getStudiesById(Long id);
+    StudiesDto getStudiesById(Long id);
 
-    Studies saveStudies(Studies studies);
+    StudiesDto saveStudies(StudiesDto studiesDto);
 
-    Studies updateStudiesById(Studies studies, Long id);
+    StudiesDto updateStudiesById(StudiesDto studiesDto, Long id);
 
     void deleteStudiesById(Long id);
+
+    Studies getStudiesEntityById(Long id);
 }
