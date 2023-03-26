@@ -21,23 +21,23 @@ public class EmployeeRestController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<List<Employee>> getAllEmployees() {
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.saveEmployee(employee));
+    public ResponseEntity<EmployeeDto> saveEmployee(@RequestBody EmployeeDto employeeDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.saveEmployee(employeeDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployeeById(@RequestBody Employee employee, @PathVariable Long id) {
-        return ResponseEntity.ok(employeeService.updateEmployeeById(employee, id));
+    public ResponseEntity<EmployeeDto> updateEmployeeById(@RequestBody EmployeeDto employeeDto, @PathVariable Long id) {
+        return ResponseEntity.ok(employeeService.updateEmployeeById(employeeDto, id));
     }
 
     @DeleteMapping("/{id}")

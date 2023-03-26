@@ -4,13 +4,13 @@ import java.util.List;
 
 public interface EmployeeService {
 
-    List<Employee> getAllEmployees();
+    List<EmployeeDto> getAllEmployees();
 
-    Employee getEmployeeById(Long id);
+    EmployeeDto getEmployeeById(Long id);
 
-    Employee saveEmployee(Employee employee);
+    EmployeeDto saveEmployee(EmployeeDto employeeDto);
 
-    Employee updateEmployeeById(Employee employee, Long id);
+    EmployeeDto updateEmployeeById(EmployeeDto employeeDto, Long id);
 
     void deleteEmployeeById(Long id);
 }
