@@ -1,5 +1,6 @@
 package com.project.ems.mentor;
 
+import com.project.ems.exception.ResourceNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -55,6 +56,6 @@ public class MentorServiceImpl implements MentorService {
 
     @Override
     public Mentor getMentorEntityById(Long id) {
-        return mentorRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Mentor with id %s not found", id)));
+        return mentorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Mentor with id %s not found", id)));
     }
 }

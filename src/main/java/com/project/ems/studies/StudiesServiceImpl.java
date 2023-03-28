@@ -1,5 +1,6 @@
 package com.project.ems.studies;
 
+import com.project.ems.exception.ResourceNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -50,6 +51,6 @@ public class StudiesServiceImpl implements StudiesService {
 
     @Override
     public Studies getStudiesEntityById(Long id) {
-        return studiesRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Studies with id %s not found", id)));
+        return studiesRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Studies with id %s not found", id)));
     }
 }

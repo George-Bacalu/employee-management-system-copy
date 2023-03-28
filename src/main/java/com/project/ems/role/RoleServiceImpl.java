@@ -1,5 +1,6 @@
 package com.project.ems.role;
 
+import com.project.ems.exception.ResourceNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -48,6 +49,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getRoleEntityById(Long id) {
-        return roleRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Role with id %s not found", id)));
+        return roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Role with id %s not found", id)));
     }
 }

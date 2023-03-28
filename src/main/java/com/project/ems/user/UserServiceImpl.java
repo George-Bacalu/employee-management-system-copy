@@ -1,6 +1,7 @@
 package com.project.ems.user;
 
 import com.project.ems.employee.EmployeeDto;
+import com.project.ems.exception.ResourceNotFoundException;
 import com.project.ems.role.RoleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserEntityById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("User with id %s not found", id)));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
     }
 }

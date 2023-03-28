@@ -1,5 +1,6 @@
 package com.project.ems.employee;
 
+import com.project.ems.exception.ResourceNotFoundException;
 import com.project.ems.mentor.MentorService;
 import com.project.ems.studies.StudiesService;
 import java.util.List;
@@ -63,6 +64,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getEmployeeEntityById(Long id) {
-        return employeeRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Employee with id %s not found", id)));
+        return employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Employee with id %s not found", id)));
     }
 }
