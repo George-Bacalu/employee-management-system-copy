@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class FeedbackDto {
 
+    @NotNull(message = "Feedback ID must not be null")
     @Positive(message = "Feedback ID must be positive")
     private Long id;
 
@@ -26,9 +27,11 @@ public class FeedbackDto {
     @NotBlank(message = "Description must not be blank")
     private String description;
 
+    @NotNull(message = "SentAt must not be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate sentAt;
 
+    @NotNull(message = "User ID must not be null")
     @Positive(message = "User ID must be positive")
     private Long userId;
 }

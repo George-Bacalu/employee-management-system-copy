@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class ExperienceDto {
 
+    @NotNull(message = "Experience ID must not be null")
     @Positive(message = "Experience ID must be positive")
     private Long id;
 
@@ -29,9 +30,11 @@ public class ExperienceDto {
     @NotNull(message = "ExperienceType must not be null")
     private ExperienceType experienceType;
 
+    @NotNull(message = "StartedAt must not be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startedAt;
 
+    @NotNull(message = "FinishedAt must not be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate finishedAt;
 }

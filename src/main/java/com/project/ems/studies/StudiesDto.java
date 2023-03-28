@@ -1,6 +1,7 @@
 package com.project.ems.studies;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class StudiesDto {
 
+    @NotNull(message = "Studies ID must not be null")
     @Positive(message = "Studies ID must be positive")
     private Long id;
 

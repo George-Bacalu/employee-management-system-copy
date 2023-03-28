@@ -23,12 +23,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class EmployeeDto {
 
+    @NotNull(message = "Employee ID must not be null")
     @Positive(message = "Employee ID must be positive")
     private Long id;
 
     @NotBlank(message = "Name must not be blank")
     private String name;
 
+    @NotNull(message = "Email must not be null")
     @Email
     private String email;
 
@@ -55,9 +57,11 @@ public class EmployeeDto {
     @NotNull(message = "Grade must not be null")
     private Grade grade;
 
+    @NotNull(message = "Mentor ID must not be null")
     @Positive(message = "Mentor ID must be positive")
     private Long mentorId;
 
+    @NotNull(message = "Studies ID must not be null")
     @Positive(message = "Studies ID must be positive")
     private Long studiesId;
 
