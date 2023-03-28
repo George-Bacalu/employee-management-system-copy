@@ -1,5 +1,6 @@
 package com.project.ems.user;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,12 +32,12 @@ public class UserRestController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> saveUser(@RequestBody @Valid UserDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(userDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUserById(@RequestBody UserDto userDto, @PathVariable Long id) {
+    public ResponseEntity<UserDto> updateUserById(@RequestBody @Valid UserDto userDto, @PathVariable Long id) {
         return ResponseEntity.ok(userService.updateUserById(userDto, id));
     }
 

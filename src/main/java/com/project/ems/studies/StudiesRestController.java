@@ -1,5 +1,6 @@
 package com.project.ems.studies;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,12 +32,12 @@ public class StudiesRestController {
     }
 
     @PostMapping
-    public ResponseEntity<StudiesDto> saveStudies(@RequestBody StudiesDto studiesDto) {
+    public ResponseEntity<StudiesDto> saveStudies(@RequestBody @Valid StudiesDto studiesDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(studiesService.saveStudies(studiesDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StudiesDto> updateStudiesById(@RequestBody StudiesDto studiesDto, @PathVariable Long id) {
+    public ResponseEntity<StudiesDto> updateStudiesById(@RequestBody @Valid StudiesDto studiesDto, @PathVariable Long id) {
         return ResponseEntity.ok(studiesService.updateStudiesById(studiesDto, id));
     }
 

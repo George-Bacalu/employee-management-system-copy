@@ -1,5 +1,6 @@
 package com.project.ems.mentor;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,12 +32,12 @@ public class MentorRestController {
     }
 
     @PostMapping
-    public ResponseEntity<MentorDto> saveMentor(@RequestBody MentorDto mentorDto) {
+    public ResponseEntity<MentorDto> saveMentor(@RequestBody @Valid MentorDto mentorDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mentorService.saveMentor(mentorDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MentorDto> updateMentorById(@RequestBody MentorDto mentorDto, @PathVariable Long id) {
+    public ResponseEntity<MentorDto> updateMentorById(@RequestBody @Valid MentorDto mentorDto, @PathVariable Long id) {
         return ResponseEntity.ok(mentorService.updateMentorById(mentorDto, id));
     }
 

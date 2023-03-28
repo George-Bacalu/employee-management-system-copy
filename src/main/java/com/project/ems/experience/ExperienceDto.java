@@ -1,6 +1,9 @@
 package com.project.ems.experience;
 
 import com.project.ems.experience.enums.ExperienceType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,12 +17,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class ExperienceDto {
 
+    @Positive(message = "Experience ID must be positive")
     private Long id;
 
+    @NotBlank(message = "Title must not be blank")
     private String title;
 
+    @NotBlank(message = "Organisation must not be blank")
     private String organization;
 
+    @NotNull(message = "ExperienceType must not be null")
     private ExperienceType experienceType;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

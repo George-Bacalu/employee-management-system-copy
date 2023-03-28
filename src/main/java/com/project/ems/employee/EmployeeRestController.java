@@ -1,5 +1,6 @@
 package com.project.ems.employee;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,12 +32,12 @@ public class EmployeeRestController {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDto> saveEmployee(@RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> saveEmployee(@RequestBody @Valid EmployeeDto employeeDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.saveEmployee(employeeDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDto> updateEmployeeById(@RequestBody EmployeeDto employeeDto, @PathVariable Long id) {
+    public ResponseEntity<EmployeeDto> updateEmployeeById(@RequestBody @Valid EmployeeDto employeeDto, @PathVariable Long id) {
         return ResponseEntity.ok(employeeService.updateEmployeeById(employeeDto, id));
     }
 

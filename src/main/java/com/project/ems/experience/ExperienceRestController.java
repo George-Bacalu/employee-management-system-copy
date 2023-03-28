@@ -1,5 +1,6 @@
 package com.project.ems.experience;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,12 +32,12 @@ public class ExperienceRestController {
     }
 
     @PostMapping
-    public ResponseEntity<ExperienceDto> saveExperience(@RequestBody ExperienceDto experienceDto) {
+    public ResponseEntity<ExperienceDto> saveExperience(@RequestBody @Valid ExperienceDto experienceDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(experienceService.saveExperience(experienceDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExperienceDto> updateExperienceById(@RequestBody ExperienceDto experienceDto, @PathVariable Long id) {
+    public ResponseEntity<ExperienceDto> updateExperienceById(@RequestBody @Valid ExperienceDto experienceDto, @PathVariable Long id) {
         return ResponseEntity.ok(experienceService.updateExperienceById(experienceDto, id));
     }
 
