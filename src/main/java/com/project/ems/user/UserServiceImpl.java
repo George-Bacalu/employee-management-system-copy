@@ -1,6 +1,5 @@
 package com.project.ems.user;
 
-import com.project.ems.employee.EmployeeDto;
 import com.project.ems.exception.ResourceNotFoundException;
 import com.project.ems.role.RoleService;
 import java.util.List;
@@ -8,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
+
+import static com.project.ems.constants.Constants.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return modelMapper.map(users, new TypeToken<List<EmployeeDto>>() {}.getType());
+        return modelMapper.map(users, new TypeToken<List<UserDto>>() {}.getType());
     }
 
     @Override
@@ -58,6 +59,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserEntityById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
     }
 }

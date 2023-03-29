@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class ExperienceServiceImpl implements ExperienceService {
@@ -53,6 +55,6 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     @Override
     public Experience getExperienceEntityById(Long id) {
-        return experienceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Experience with id %s not found", id)));
+        return experienceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, id)));
     }
 }

@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
@@ -64,6 +66,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getEmployeeEntityById(Long id) {
-        return employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Employee with id %s not found", id)));
+        return employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id)));
     }
 }

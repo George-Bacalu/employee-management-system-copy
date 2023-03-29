@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import static com.project.ems.constants.Constants.MENTOR_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class MentorServiceImpl implements MentorService {
@@ -56,6 +58,6 @@ public class MentorServiceImpl implements MentorService {
 
     @Override
     public Mentor getMentorEntityById(Long id) {
-        return mentorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Mentor with id %s not found", id)));
+        return mentorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id)));
     }
 }

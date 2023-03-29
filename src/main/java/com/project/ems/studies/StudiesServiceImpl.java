@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class StudiesServiceImpl implements StudiesService {
@@ -51,6 +53,6 @@ public class StudiesServiceImpl implements StudiesService {
 
     @Override
     public Studies getStudiesEntityById(Long id) {
-        return studiesRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Studies with id %s not found", id)));
+        return studiesRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id)));
     }
 }

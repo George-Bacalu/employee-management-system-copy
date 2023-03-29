@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class FeedbackServiceImpl implements FeedbackService {
@@ -54,6 +56,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Feedback getFeedbackEntityById(Long id) {
-        return feedbackRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Feedback with id %s not found", id)));
+        return feedbackRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id)));
     }
 }

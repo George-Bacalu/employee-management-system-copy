@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import static com.project.ems.constants.Constants.ROLE_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
@@ -49,6 +51,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getRoleEntityById(Long id) {
-        return roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Role with id %s not found", id)));
+        return roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(ROLE_NOT_FOUND, id)));
     }
 }
