@@ -23,7 +23,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class EmployeeDto {
 
-    @NotNull(message = "Employee ID must not be null")
     @Positive(message = "Employee ID must be positive")
     private Long id;
 

@@ -10,6 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExperienceMock {
 
+    public static List<Experience> getMockedExperiences() {
+        return List.of(getMockedExperience1(), getMockedExperience2(), getMockedExperience3(), getMockedExperience4());
+    }
+
     public static List<Experience> getMockedExperiences1() {
         return List.of(getMockedExperience1(), getMockedExperience2());
     }

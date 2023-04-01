@@ -18,7 +18,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class UserDto {
 
-    @NotNull(message = "User ID must not be null")
     @Positive(message = "User ID must be positive")
     private Long id;
 
