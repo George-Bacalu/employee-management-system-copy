@@ -1,9 +1,11 @@
 package com.project.ems.employee;
 
 import com.project.ems.exception.ResourceNotFoundException;
+import com.project.ems.experience.ExperienceService;
 import com.project.ems.mentor.MentorService;
 import com.project.ems.studies.StudiesService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -18,6 +20,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final MentorService mentorService;
     private final StudiesService studiesService;
+    private final ExperienceService experienceService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -35,6 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
         Employee employee = modelMapper.map(employeeDto, Employee.class);
+        employee.setExperiences(employeeDto.getExperiencesIds().stream().map(experienceService::getExperienceEntityById).toList());
         Employee savedEmployee = employeeRepository.save(employee);
         return modelMapper.map(savedEmployee, EmployeeDto.class);
     }
@@ -53,7 +57,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setGrade(employeeDto.getGrade());
         employee.setMentor(mentorService.getMentorEntityById(employeeDto.getMentorId()));
         employee.setStudies(studiesService.getStudiesEntityById(employeeDto.getStudiesId()));
-        employee.setExperiences(employeeDto.getExperiences());
+        employee.setExperiences(employeeDto.getExperiencesIds().stream().map(experienceService::getExperienceEntityById).collect(Collectors.toList()));
         Employee updatedEmployee = employeeRepository.save(employee);
         return modelMapper.map(updatedEmployee, EmployeeDto.class);
     }

@@ -6,7 +6,6 @@ import com.project.ems.employee.EmployeeDto;
 import com.project.ems.employee.EmployeeRestController;
 import com.project.ems.employee.EmployeeService;
 import com.project.ems.exception.ResourceNotFoundException;
-import com.project.ems.experience.Experience;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,15 +61,17 @@ class EmployeeRestControllerMockMvcTest {
         employeeDto1 = modelMapper.map(getMockedEmployee1(), EmployeeDto.class);
         employeeDto2 = modelMapper.map(getMockedEmployee2(), EmployeeDto.class);
         employeeDtos = modelMapper.map(getMockedEmployees(), new TypeToken<List<EmployeeDto>>() {}.getType());
+        employeeDto1.setExperiencesIds(List.of(1L, 2L));
+        employeeDto2.setExperiencesIds(List.of(3L, 4L));
+        List<Long> experienceIds = List.of(1L, 2L, 3L, 4L);
+        for (int i = 0; i < employeeDtos.size(); i++) {
+            employeeDtos.get(i).setExperiencesIds(experienceIds.subList(i * 2, i * 2 + 2));
+        }
     }
 
     @Test
     void getAllEmployees_shouldReturnListOfEmployees() throws Exception {
         given(employeeService.getAllEmployees()).willReturn(employeeDtos);
-        Experience employee1Experience1 = employeeDto1.getExperiences().get(0);
-        Experience employee1Experience2 = employeeDto1.getExperiences().get(1);
-        Experience employee2Experience1 = employeeDto2.getExperiences().get(0);
-        Experience employee2Experience2 = employeeDto2.getExperiences().get(1);
         MvcResult result = mockMvc.perform(get("/api/employees").accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$[0].id").value(employeeDto1.getId()))
@@ -85,12 +86,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$[0].grade").value(employeeDto1.getGrade().toString()))
               .andExpect(jsonPath("$[0].mentorId").value(employeeDto1.getMentorId()))
               .andExpect(jsonPath("$[0].studiesId").value(employeeDto1.getStudiesId()))
-              .andExpect(jsonPath("$[0].experiences[*].id", containsInAnyOrder(Math.toIntExact(employee1Experience1.getId()), Math.toIntExact(employee1Experience2.getId()))))
-              .andExpect(jsonPath("$[0].experiences[*].title", containsInAnyOrder(employee1Experience1.getTitle(), employee1Experience2.getTitle())))
-              .andExpect(jsonPath("$[0].experiences[*].organization", containsInAnyOrder(employee1Experience1.getOrganization(), employee1Experience2.getOrganization())))
-              .andExpect(jsonPath("$[0].experiences[*].experienceType", containsInAnyOrder(employee1Experience1.getExperienceType().toString(), employee1Experience2.getExperienceType().toString())))
-              .andExpect(jsonPath("$[0].experiences[*].startedAt", containsInAnyOrder(employee1Experience1.getStartedAt().toString(), employee1Experience2.getStartedAt().toString())))
-              .andExpect(jsonPath("$[0].experiences[*].finishedAt", containsInAnyOrder(employee1Experience1.getFinishedAt().toString(), employee1Experience2.getFinishedAt().toString())))
+              .andExpect(jsonPath("$[0].experiencesIds", containsInAnyOrder(1, 2)))
               .andExpect(jsonPath("$[1].id").value(employeeDto2.getId()))
               .andExpect(jsonPath("$[1].name").value(employeeDto2.getName()))
               .andExpect(jsonPath("$[1].email").value(employeeDto2.getEmail()))
@@ -103,12 +99,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$[1].grade").value(employeeDto2.getGrade().toString()))
               .andExpect(jsonPath("$[1].mentorId").value(employeeDto2.getMentorId()))
               .andExpect(jsonPath("$[1].studiesId").value(employeeDto2.getStudiesId()))
-              .andExpect(jsonPath("$[1].experiences[*].id", containsInAnyOrder(Math.toIntExact(employee2Experience1.getId()), Math.toIntExact(employee2Experience2.getId()))))
-              .andExpect(jsonPath("$[1].experiences[*].title", containsInAnyOrder(employee2Experience1.getTitle(), employee2Experience2.getTitle())))
-              .andExpect(jsonPath("$[1].experiences[*].organization", containsInAnyOrder(employee2Experience1.getOrganization(), employee2Experience2.getOrganization())))
-              .andExpect(jsonPath("$[1].experiences[*].experienceType", containsInAnyOrder(employee2Experience1.getExperienceType().toString(), employee2Experience2.getExperienceType().toString())))
-              .andExpect(jsonPath("$[1].experiences[*].startedAt", containsInAnyOrder(employee2Experience1.getStartedAt().toString(), employee2Experience2.getStartedAt().toString())))
-              .andExpect(jsonPath("$[1].experiences[*].finishedAt", containsInAnyOrder(employee2Experience1.getFinishedAt().toString(), employee2Experience2.getFinishedAt().toString())))
+              .andExpect(jsonPath("$[1].experiencesIds", containsInAnyOrder(3, 4)))
               .andReturn();
         List<EmployeeDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(employeeDtos);
@@ -118,8 +109,6 @@ class EmployeeRestControllerMockMvcTest {
     void getEmployeeById_withValidId_shouldReturnEmployeeWithGivenId() throws Exception {
         Long id = 1L;
         given(employeeService.getEmployeeById(anyLong())).willReturn(employeeDto1);
-        Experience employeeExperience1 = employeeDto1.getExperiences().get(0);
-        Experience employeeExperience2 = employeeDto1.getExperiences().get(1);
         MvcResult result = mockMvc.perform(get("/api/employees/{id}", id).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(employeeDto1.getId()))
@@ -134,12 +123,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$.grade").value(employeeDto1.getGrade().toString()))
               .andExpect(jsonPath("$.mentorId").value(employeeDto1.getMentorId()))
               .andExpect(jsonPath("$.studiesId").value(employeeDto1.getStudiesId()))
-              .andExpect(jsonPath("$.experiences[*].id", containsInAnyOrder(Math.toIntExact(employeeExperience1.getId()), Math.toIntExact(employeeExperience2.getId()))))
-              .andExpect(jsonPath("$.experiences[*].title", containsInAnyOrder(employeeExperience1.getTitle(), employeeExperience2.getTitle())))
-              .andExpect(jsonPath("$.experiences[*].organization", containsInAnyOrder(employeeExperience1.getOrganization(), employeeExperience2.getOrganization())))
-              .andExpect(jsonPath("$.experiences[*].experienceType", containsInAnyOrder(employeeExperience1.getExperienceType().toString(), employeeExperience2.getExperienceType().toString())))
-              .andExpect(jsonPath("$.experiences[*].startedAt", containsInAnyOrder(employeeExperience1.getStartedAt().toString(), employeeExperience2.getStartedAt().toString())))
-              .andExpect(jsonPath("$.experiences[*].finishedAt", containsInAnyOrder(employeeExperience1.getFinishedAt().toString(), employeeExperience2.getFinishedAt().toString())))
+              .andExpect(jsonPath("$.experiencesIds", containsInAnyOrder(1, 2)))
               .andReturn();
         EmployeeDto response = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeDto.class);
         assertThat(response).isEqualTo(employeeDto1);
@@ -157,8 +141,6 @@ class EmployeeRestControllerMockMvcTest {
     @Test
     void saveEmployee_shouldAddEmployeeToList() throws Exception {
         given(employeeService.saveEmployee(any(EmployeeDto.class))).willReturn(employeeDto1);
-        Experience employeeExperience1 = employeeDto1.getExperiences().get(0);
-        Experience employeeExperience2 = employeeDto1.getExperiences().get(1);
         MvcResult result = mockMvc.perform(post("/api/employees").accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(employeeDto1)))
@@ -175,12 +157,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$.grade").value(employeeDto1.getGrade().toString()))
               .andExpect(jsonPath("$.mentorId").value(employeeDto1.getMentorId()))
               .andExpect(jsonPath("$.studiesId").value(employeeDto1.getStudiesId()))
-              .andExpect(jsonPath("$.experiences[*].id", containsInAnyOrder(Math.toIntExact(employeeExperience1.getId()), Math.toIntExact(employeeExperience2.getId()))))
-              .andExpect(jsonPath("$.experiences[*].title", containsInAnyOrder(employeeExperience1.getTitle(), employeeExperience2.getTitle())))
-              .andExpect(jsonPath("$.experiences[*].organization", containsInAnyOrder(employeeExperience1.getOrganization(), employeeExperience2.getOrganization())))
-              .andExpect(jsonPath("$.experiences[*].experienceType", containsInAnyOrder(employeeExperience1.getExperienceType().toString(), employeeExperience2.getExperienceType().toString())))
-              .andExpect(jsonPath("$.experiences[*].startedAt", containsInAnyOrder(employeeExperience1.getStartedAt().toString(), employeeExperience2.getStartedAt().toString())))
-              .andExpect(jsonPath("$.experiences[*].finishedAt", containsInAnyOrder(employeeExperience1.getFinishedAt().toString(), employeeExperience2.getFinishedAt().toString())))
+              .andExpect(jsonPath("$.experiencesIds", containsInAnyOrder(1, 2)))
               .andReturn();
         EmployeeDto response = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeDto.class);
         assertThat(response).isEqualTo(employeeDto1);
@@ -192,8 +169,6 @@ class EmployeeRestControllerMockMvcTest {
         EmployeeDto employeeDto = employeeDto2;
         employeeDto.setId(id);
         given(employeeService.updateEmployeeById(any(EmployeeDto.class), anyLong())).willReturn(employeeDto);
-        Experience employeeExperience1 = employeeDto2.getExperiences().get(0);
-        Experience employeeExperience2 = employeeDto2.getExperiences().get(1);
         MvcResult result = mockMvc.perform(put("/api/employees/{id}", id).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(employeeDto)))
@@ -210,12 +185,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$.grade").value(employeeDto2.getGrade().toString()))
               .andExpect(jsonPath("$.mentorId").value(employeeDto2.getMentorId()))
               .andExpect(jsonPath("$.studiesId").value(employeeDto2.getStudiesId()))
-              .andExpect(jsonPath("$.experiences[*].id", containsInAnyOrder(Math.toIntExact(employeeExperience1.getId()), Math.toIntExact(employeeExperience2.getId()))))
-              .andExpect(jsonPath("$.experiences[*].title", containsInAnyOrder(employeeExperience1.getTitle(), employeeExperience2.getTitle())))
-              .andExpect(jsonPath("$.experiences[*].organization", containsInAnyOrder(employeeExperience1.getOrganization(), employeeExperience2.getOrganization())))
-              .andExpect(jsonPath("$.experiences[*].experienceType", containsInAnyOrder(employeeExperience1.getExperienceType().toString(), employeeExperience2.getExperienceType().toString())))
-              .andExpect(jsonPath("$.experiences[*].startedAt", containsInAnyOrder(employeeExperience1.getStartedAt().toString(), employeeExperience2.getStartedAt().toString())))
-              .andExpect(jsonPath("$.experiences[*].finishedAt", containsInAnyOrder(employeeExperience1.getFinishedAt().toString(), employeeExperience2.getFinishedAt().toString())))
+              .andExpect(jsonPath("$.experiencesIds", containsInAnyOrder(3, 4)))
               .andReturn();
         EmployeeDto response = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeDto.class);
         assertThat(response).isEqualTo(employeeDto);

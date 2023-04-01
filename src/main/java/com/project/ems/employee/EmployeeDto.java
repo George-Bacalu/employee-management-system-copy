@@ -3,7 +3,6 @@ package com.project.ems.employee;
 import com.project.ems.employee.enums.Grade;
 import com.project.ems.employee.enums.JobType;
 import com.project.ems.employee.enums.Position;
-import com.project.ems.experience.Experience;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -65,5 +64,5 @@ public class EmployeeDto {
     private Long studiesId;
 
     @NotNull(message = "Experiences must not be null")
-    private List<Experience> experiences;
+    private List<Long> experiencesIds;
 }
