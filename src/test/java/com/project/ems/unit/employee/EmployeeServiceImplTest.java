@@ -5,6 +5,8 @@ import com.project.ems.employee.EmployeeDto;
 import com.project.ems.employee.EmployeeRepository;
 import com.project.ems.employee.EmployeeServiceImpl;
 import com.project.ems.exception.ResourceNotFoundException;
+import com.project.ems.experience.Experience;
+import com.project.ems.experience.ExperienceService;
 import com.project.ems.mentor.Mentor;
 import com.project.ems.mentor.MentorService;
 import com.project.ems.studies.Studies;
@@ -27,6 +29,8 @@ import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
+import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
+import static com.project.ems.mock.ExperienceMock.getMockedExperiences2;
 import static com.project.ems.mock.MentorMock.getMockedMentor2;
 import static com.project.ems.mock.StudiesMock.getMockedStudies2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +56,9 @@ class EmployeeServiceImplTest {
     @Mock
     private StudiesService studiesService;
 
+    @Mock
+    private ExperienceService experienceService;
+
     @Spy
     private ModelMapper modelMapper;
 
@@ -63,6 +70,8 @@ class EmployeeServiceImplTest {
     private List<Employee> employees;
     private Mentor mentor;
     private Studies studies;
+    private List<Experience> experiences1;
+    private List<Experience> experiences2;
     private EmployeeDto employeeDto1;
     private EmployeeDto employeeDto2;
     private List<EmployeeDto> employeeDtos;
@@ -74,6 +83,8 @@ class EmployeeServiceImplTest {
         employees = getMockedEmployees();
         mentor = getMockedMentor2();
         studies = getMockedStudies2();
+        experiences1 = getMockedExperiences1();
+        experiences2 = getMockedExperiences2();
         employeeDto1 = modelMapper.map(employee1, EmployeeDto.class);
         employeeDto2 = modelMapper.map(employee2, EmployeeDto.class);
         employeeDtos = modelMapper.map(employees, new TypeToken<List<EmployeeDto>>() {}.getType());
@@ -104,6 +115,8 @@ class EmployeeServiceImplTest {
 
     @Test
     void saveEmployee_shouldAddEmployeeToList() {
+        employeeDto1.setExperiencesIds(List.of(1L, 2L));
+        employeeDto1.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences1.get((int) (id - 1))));
         given(employeeRepository.save(any(Employee.class))).willReturn(employee1);
         EmployeeDto result = employeeService.saveEmployee(employeeDto1);
         verify(employeeRepository).save(employeeCaptor.capture());
@@ -112,6 +125,8 @@ class EmployeeServiceImplTest {
 
     @Test
     void updateEmployeeById_withValidId_shouldUpdateEmployeeWithGivenId() {
+        employeeDto2.setExperiencesIds(List.of(3L, 4L));
+        employeeDto2.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences2.get((int) (id - 3))));
         Long id = 1L;
         Employee employee = employee2;
         employee.setId(id);

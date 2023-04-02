@@ -7,18 +7,22 @@ import com.project.ems.feedback.FeedbackRepository;
 import com.project.ems.feedback.FeedbackServiceImpl;
 import com.project.ems.user.User;
 import com.project.ems.user.UserService;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
@@ -45,8 +49,13 @@ class FeedbackServiceIntegrationTest {
     @MockBean
     private UserService userService;
 
-    @Spy
+    @SpyBean
     private ModelMapper modelMapper;
+
+    @MockBean
+    private Clock clock;
+
+    private static final ZonedDateTime zonedDateTime = ZonedDateTime.of(2023, 1, 1, 0, 0, 0, 0, ZoneId.of("Europe/Bucharest"));
 
     @Captor
     private ArgumentCaptor<Feedback> feedbackCaptor;
@@ -95,6 +104,9 @@ class FeedbackServiceIntegrationTest {
 
     @Test
     void saveFeedback_shouldAddFeedbackToList() {
+        given(clock.getZone()).willReturn(zonedDateTime.getZone());
+        given(clock.instant()).willReturn(zonedDateTime.toInstant());
+        feedback1.setSentAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0));
         given(feedbackRepository.save(any(Feedback.class))).willReturn(feedback1);
         FeedbackDto result = feedbackService.saveFeedback(feedbackDto1);
         verify(feedbackRepository).save(feedbackCaptor.capture());

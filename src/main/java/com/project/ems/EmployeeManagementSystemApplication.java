@@ -1,5 +1,7 @@
 package com.project.ems;
 
+import java.time.Clock;
+import java.time.ZoneId;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,5 +17,10 @@ public class EmployeeManagementSystemApplication {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.system(ZoneId.of("Europe/Bucharest"));
     }
 }

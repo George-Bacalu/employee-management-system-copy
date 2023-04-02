@@ -2,7 +2,6 @@ package com.project.ems.mock;
 
 import com.project.ems.feedback.Feedback;
 import com.project.ems.feedback.enums.FeedbackType;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,6 @@ public class FeedbackMock {
               .id(1L)
               .feedbackType(FeedbackType.BUG)
               .description("test_feedback_description1")
-              .sentAt(LocalDate.of(1990, 1, 1))
               .user(getMockedUser1())
               .build();
     }
@@ -32,7 +30,6 @@ public class FeedbackMock {
               .id(2L)
               .feedbackType(FeedbackType.IMPROVEMENT)
               .description("test_feedback_description2")
-              .sentAt(LocalDate.of(1990, 1, 2))
               .user(getMockedUser2())
               .build();
     }

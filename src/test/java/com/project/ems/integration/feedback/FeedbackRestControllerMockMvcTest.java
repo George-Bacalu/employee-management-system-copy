@@ -23,6 +23,7 @@ import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback2;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -69,12 +70,12 @@ class FeedbackRestControllerMockMvcTest {
               .andExpect(jsonPath("$[0].id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$[0].feedbackType").value(feedbackDto1.getFeedbackType().toString()))
               .andExpect(jsonPath("$[0].description").value(feedbackDto1.getDescription()))
-              .andExpect(jsonPath("$[0].sentAt").value(feedbackDto1.getSentAt().toString()))
+              .andExpect(jsonPath("$[0].sentAt").value(nullValue()))
               .andExpect(jsonPath("$[0].userId").value(feedbackDto1.getUserId()))
               .andExpect(jsonPath("$[1].id").value(feedbackDto2.getId()))
               .andExpect(jsonPath("$[1].feedbackType").value(feedbackDto2.getFeedbackType().toString()))
               .andExpect(jsonPath("$[1].description").value(feedbackDto2.getDescription()))
-              .andExpect(jsonPath("$[1].sentAt").value(feedbackDto2.getSentAt().toString()))
+              .andExpect(jsonPath("$[1].sentAt").value(nullValue()))
               .andExpect(jsonPath("$[1].userId").value(feedbackDto2.getUserId()))
               .andReturn();
         List<FeedbackDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
@@ -90,7 +91,7 @@ class FeedbackRestControllerMockMvcTest {
               .andExpect(jsonPath("$.id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$.feedbackType").value(feedbackDto1.getFeedbackType().toString()))
               .andExpect(jsonPath("$.description").value(feedbackDto1.getDescription()))
-              .andExpect(jsonPath("$.sentAt").value(feedbackDto1.getSentAt().toString()))
+              .andExpect(jsonPath("$.sentAt").value(nullValue()))
               .andExpect(jsonPath("$.userId").value(feedbackDto1.getUserId()))
               .andReturn();
         FeedbackDto response = objectMapper.readValue(result.getResponse().getContentAsString(), FeedbackDto.class);
@@ -116,7 +117,7 @@ class FeedbackRestControllerMockMvcTest {
               .andExpect(jsonPath("$.id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$.feedbackType").value(feedbackDto1.getFeedbackType().toString()))
               .andExpect(jsonPath("$.description").value(feedbackDto1.getDescription()))
-              .andExpect(jsonPath("$.sentAt").value(feedbackDto1.getSentAt().toString()))
+              .andExpect(jsonPath("$.sentAt").value(nullValue()))
               .andExpect(jsonPath("$.userId").value(feedbackDto1.getUserId()))
               .andReturn();
         FeedbackDto response = objectMapper.readValue(result.getResponse().getContentAsString(), FeedbackDto.class);
@@ -136,7 +137,7 @@ class FeedbackRestControllerMockMvcTest {
               .andExpect(jsonPath("$.id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$.feedbackType").value(feedbackDto2.getFeedbackType().toString()))
               .andExpect(jsonPath("$.description").value(feedbackDto2.getDescription()))
-              .andExpect(jsonPath("$.sentAt").value(feedbackDto2.getSentAt().toString()))
+              .andExpect(jsonPath("$.sentAt").value(nullValue()))
               .andExpect(jsonPath("$.userId").value(feedbackDto2.getUserId()))
               .andReturn();
         FeedbackDto response = objectMapper.readValue(result.getResponse().getContentAsString(), FeedbackDto.class);

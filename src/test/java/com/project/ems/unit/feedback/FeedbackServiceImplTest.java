@@ -7,6 +7,10 @@ import com.project.ems.feedback.FeedbackRepository;
 import com.project.ems.feedback.FeedbackServiceImpl;
 import com.project.ems.user.User;
 import com.project.ems.user.UserService;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +52,11 @@ class FeedbackServiceImplTest {
 
     @Spy
     private ModelMapper modelMapper;
+
+    @Mock
+    private Clock clock;
+
+    private static final ZonedDateTime zonedDateTime = ZonedDateTime.of(2023, 1, 1, 0, 0, 0, 0, ZoneId.of("Europe/Bucharest"));
 
     @Captor
     private ArgumentCaptor<Feedback> feedbackCaptor;
@@ -96,6 +105,9 @@ class FeedbackServiceImplTest {
 
     @Test
     void saveFeedback_shouldAddFeedbackToList() {
+        given(clock.getZone()).willReturn(zonedDateTime.getZone());
+        given(clock.instant()).willReturn(zonedDateTime.toInstant());
+        feedback1.setSentAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0));
         given(feedbackRepository.save(any(Feedback.class))).willReturn(feedback1);
         FeedbackDto result = feedbackService.saveFeedback(feedbackDto1);
         verify(feedbackRepository).save(feedbackCaptor.capture());
