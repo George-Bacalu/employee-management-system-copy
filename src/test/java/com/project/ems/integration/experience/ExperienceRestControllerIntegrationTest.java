@@ -3,11 +3,12 @@ package com.project.ems.integration.experience;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.experience.ExperienceDto;
+import com.project.ems.experience.ExperienceRepository;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
@@ -27,16 +30,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "classpath:data-test.sql")
 class ExperienceRestControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
 
     @Autowired
+    private ExperienceRepository experienceRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    @Spy
+    @Autowired
     private ModelMapper modelMapper;
 
     private ExperienceDto experienceDto1;
@@ -48,6 +56,11 @@ class ExperienceRestControllerIntegrationTest {
         experienceDto1 = modelMapper.map(getMockedExperience1(), ExperienceDto.class);
         experienceDto2 = modelMapper.map(getMockedExperience2(), ExperienceDto.class);
         experienceDtos = modelMapper.map(getMockedExperiences(), new TypeToken<List<ExperienceDto>>() {}.getType());
+    }
+
+    @AfterEach
+    void tearDown() {
+        experienceRepository.deleteAll();
     }
 
     @Test

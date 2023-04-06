@@ -3,11 +3,12 @@ package com.project.ems.integration.studies;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.studies.StudiesDto;
+import com.project.ems.studies.StudiesRepository;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
@@ -27,16 +30,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "classpath:data-test.sql")
 class StudiesRestControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
 
     @Autowired
+    private StudiesRepository studiesRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    @Spy
+    @Autowired
     private ModelMapper modelMapper;
 
     private StudiesDto studiesDto1;
@@ -48,6 +56,11 @@ class StudiesRestControllerIntegrationTest {
         studiesDto1 = modelMapper.map(getMockedStudies1(), StudiesDto.class);
         studiesDto2 = modelMapper.map(getMockedStudies2(), StudiesDto.class);
         studiesDtos = modelMapper.map(getMockedStudies(), new TypeToken<List<StudiesDto>>() {}.getType());
+    }
+
+    @AfterEach
+    void tearDown() {
+        studiesRepository.deleteAll();
     }
 
     @Test

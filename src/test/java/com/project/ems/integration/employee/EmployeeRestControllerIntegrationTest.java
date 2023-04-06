@@ -3,11 +3,12 @@ package com.project.ems.integration.employee;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.employee.EmployeeDto;
+import com.project.ems.employee.EmployeeRepository;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
@@ -27,16 +30,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "classpath:data-test.sql")
 class EmployeeRestControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
 
     @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    @Spy
+    @Autowired
     private ModelMapper modelMapper;
 
     private EmployeeDto employeeDto1;
@@ -48,6 +56,11 @@ class EmployeeRestControllerIntegrationTest {
         employeeDto1 = modelMapper.map(getMockedEmployee1(), EmployeeDto.class);
         employeeDto2 = modelMapper.map(getMockedEmployee2(), EmployeeDto.class);
         employeeDtos = modelMapper.map(getMockedEmployees(), new TypeToken<List<EmployeeDto>>() {}.getType());
+    }
+
+    @AfterEach
+    void tearDown() {
+        employeeRepository.deleteAll();
     }
 
     @Test

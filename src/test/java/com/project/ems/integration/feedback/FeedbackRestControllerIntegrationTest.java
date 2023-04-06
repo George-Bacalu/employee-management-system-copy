@@ -3,11 +3,12 @@ package com.project.ems.integration.feedback;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.feedback.FeedbackDto;
+import com.project.ems.feedback.FeedbackRepository;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
@@ -27,7 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "classpath:data-test.sql")
 class FeedbackRestControllerIntegrationTest {
 
     @Autowired
@@ -36,7 +41,10 @@ class FeedbackRestControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Spy
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     private FeedbackDto feedbackDto1;
@@ -48,6 +56,11 @@ class FeedbackRestControllerIntegrationTest {
         feedbackDto1 = modelMapper.map(getMockedFeedback1(), FeedbackDto.class);
         feedbackDto2 = modelMapper.map(getMockedFeedback2(), FeedbackDto.class);
         feedbackDtos = modelMapper.map(getMockedFeedbacks(), new TypeToken<List<FeedbackDto>>() {}.getType());
+    }
+
+    @AfterEach
+    void tearDown() {
+        feedbackRepository.deleteAll();
     }
 
     @Test
