@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -161,7 +162,7 @@ class StudiesRestControllerMockMvcTest {
     @Test
     void deleteStudiesById_withInvalidId_shouldThrowException() throws Exception {
         Long id = 999L;
-        given(studiesService.getStudiesById(anyLong())).willThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id)));
+        doThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id))).when(studiesService).deleteStudiesById(id);
         mockMvc.perform(delete("/api/studies/{id}", id).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();

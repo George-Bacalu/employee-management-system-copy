@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -167,7 +168,7 @@ class FeedbackRestControllerMockMvcTest {
     @Test
     void deleteFeedbackById_withInvalidId_shouldThrowException() throws Exception {
         Long id = 999L;
-        given(feedbackService.getFeedbackById(anyLong())).willThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id)));
+        doThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id))).when(feedbackService).deleteFeedbackById(id);
         mockMvc.perform(delete("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();

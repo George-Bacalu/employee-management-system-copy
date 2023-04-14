@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -214,7 +215,7 @@ class EmployeeRestControllerMockMvcTest {
     @Test
     void deleteEmployeeById_withInvalidId_shouldThrowException() throws Exception {
         Long id = 999L;
-        given(employeeService.getEmployeeById(anyLong())).willThrow(new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id)));
+        doThrow(new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id))).when(employeeService).deleteEmployeeById(id);
         mockMvc.perform(delete("/api/employees/{id}", id).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();

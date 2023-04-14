@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -187,7 +188,7 @@ class MentorRestControllerMockMvcTest {
     @Test
     void deleteMentorById_withInvalidId_shouldThrowException() throws Exception {
         Long id = 999L;
-        given(mentorService.getMentorById(anyLong())).willThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id)));
+        doThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id))).when(mentorService).deleteMentorById(id);
         mockMvc.perform(delete("/api/mentors/{id}", id).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
