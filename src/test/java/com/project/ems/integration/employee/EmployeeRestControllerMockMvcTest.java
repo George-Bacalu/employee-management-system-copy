@@ -17,14 +17,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -73,38 +73,52 @@ class EmployeeRestControllerMockMvcTest {
     @Test
     void getAllEmployees_shouldReturnListOfEmployees() throws Exception {
         given(employeeService.getAllEmployees()).willReturn(employeeDtos);
-        MvcResult result = mockMvc.perform(get("/api/employees").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(employeeDto1.getId()))
-              .andExpect(jsonPath("$[0].name").value(employeeDto1.getName()))
-              .andExpect(jsonPath("$[0].email").value(employeeDto1.getEmail()))
-              .andExpect(jsonPath("$[0].password").value(employeeDto1.getPassword()))
-              .andExpect(jsonPath("$[0].mobile").value(employeeDto1.getMobile()))
-              .andExpect(jsonPath("$[0].address").value(employeeDto1.getAddress()))
-              .andExpect(jsonPath("$[0].birthday").value(equalTo(employeeDto1.getBirthday().toString())))
-              .andExpect(jsonPath("$[0].jobType").value(employeeDto1.getJobType().toString()))
-              .andExpect(jsonPath("$[0].position").value(employeeDto1.getPosition().toString()))
-              .andExpect(jsonPath("$[0].grade").value(employeeDto1.getGrade().toString()))
-              .andExpect(jsonPath("$[0].mentorId").value(employeeDto1.getMentorId()))
-              .andExpect(jsonPath("$[0].studiesId").value(employeeDto1.getStudiesId()))
-              .andExpect(jsonPath("$[0].experiencesIds", containsInAnyOrder(1, 2)))
-              .andExpect(jsonPath("$[1].id").value(employeeDto2.getId()))
-              .andExpect(jsonPath("$[1].name").value(employeeDto2.getName()))
-              .andExpect(jsonPath("$[1].email").value(employeeDto2.getEmail()))
-              .andExpect(jsonPath("$[1].password").value(employeeDto2.getPassword()))
-              .andExpect(jsonPath("$[1].mobile").value(employeeDto2.getMobile()))
-              .andExpect(jsonPath("$[1].address").value(employeeDto2.getAddress()))
-              .andExpect(jsonPath("$[1].birthday").value(equalTo(employeeDto2.getBirthday().toString())))
-              .andExpect(jsonPath("$[1].jobType").value(employeeDto2.getJobType().toString()))
-              .andExpect(jsonPath("$[1].position").value(employeeDto2.getPosition().toString()))
-              .andExpect(jsonPath("$[1].grade").value(employeeDto2.getGrade().toString()))
-              .andExpect(jsonPath("$[1].mentorId").value(employeeDto2.getMentorId()))
-              .andExpect(jsonPath("$[1].studiesId").value(employeeDto2.getStudiesId()))
-              .andExpect(jsonPath("$[1].experiencesIds", containsInAnyOrder(3, 4)))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/employees").accept(APPLICATION_JSON_VALUE)).andExpect(status().isOk());
+        for(EmployeeDto employeeDto : employeeDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].name").value(employeeDto.getName()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].email").value(employeeDto.getEmail()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].password").value(employeeDto.getPassword()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].mobile").value(employeeDto.getMobile()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].address").value(employeeDto.getAddress()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].birthday").value(employeeDto.getBirthday().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].jobType").value(employeeDto.getJobType().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].position").value(employeeDto.getPosition().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].grade").value(employeeDto.getGrade().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].mentorId").value(employeeDto.getMentorId().intValue()));
+            actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].studiesId").value(employeeDto.getStudiesId().intValue()));
+            for(int i = 0; i < employeeDto.getExperiencesIds().size(); i++) {
+                actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].experiencesIds[" + i + "]").value(employeeDto.getExperiencesIds().get(i).intValue()));
+            }
+        }
+        MvcResult result = actions.andReturn();
         List<EmployeeDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(employeeDtos);
     }
+
+//    @Test
+//    void getAllEmployees_shouldReturnListOfEmployees() throws Exception {
+//        given(employeeService.getAllEmployees()).willReturn(employeeDtos);
+//        MvcResult result = mockMvc.perform(get("/api/employees").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(employeeDto1.getId().intValue(), employeeDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].name").value(contains(employeeDto1.getName(), employeeDto2.getName())))
+//              .andExpect(jsonPath("$[*].email").value(contains(employeeDto1.getEmail(), employeeDto2.getEmail())))
+//              .andExpect(jsonPath("$[*].password").value(contains(employeeDto1.getPassword(), employeeDto2.getPassword())))
+//              .andExpect(jsonPath("$[*].mobile").value(contains(employeeDto1.getMobile(), employeeDto2.getMobile())))
+//              .andExpect(jsonPath("$[*].address").value(contains(employeeDto1.getAddress(), employeeDto2.getAddress())))
+//              .andExpect(jsonPath("$[*].birthday").value(contains(employeeDto1.getBirthday().toString(), employeeDto2.getBirthday().toString())))
+//              .andExpect(jsonPath("$[*].jobType").value(contains(employeeDto1.getJobType().toString(), employeeDto2.getJobType().toString())))
+//              .andExpect(jsonPath("$[*].position").value(contains(employeeDto1.getPosition().toString(), employeeDto2.getPosition().toString())))
+//              .andExpect(jsonPath("$[*].grade").value(contains(employeeDto1.getGrade().toString(), employeeDto2.getGrade().toString())))
+//              .andExpect(jsonPath("$[*].mentorId").value(contains(employeeDto1.getMentorId().intValue(), employeeDto2.getMentorId().intValue())))
+//              .andExpect(jsonPath("$[*].studiesId").value(contains(employeeDto1.getStudiesId().intValue(), employeeDto2.getStudiesId().intValue())))
+//              .andExpect(jsonPath("$[*].experiencesIds[*]").value(contains(employeeDto1.getExperiencesIds().get(0).intValue(), employeeDto1.getExperiencesIds().get(1).intValue(),
+//                                                                           employeeDto2.getExperiencesIds().get(0).intValue(), employeeDto2.getExperiencesIds().get(1).intValue())))
+//              .andReturn();
+//        List<EmployeeDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(employeeDtos);
+//    }
 
     @Test
     void getEmployeeById_withValidId_shouldReturnEmployeeWithGivenId() throws Exception {
@@ -124,7 +138,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$.grade").value(employeeDto1.getGrade().toString()))
               .andExpect(jsonPath("$.mentorId").value(employeeDto1.getMentorId()))
               .andExpect(jsonPath("$.studiesId").value(employeeDto1.getStudiesId()))
-              .andExpect(jsonPath("$.experiencesIds", containsInAnyOrder(1, 2)))
+              .andExpect(jsonPath("$.experiencesIds", contains(1, 2)))
               .andReturn();
         EmployeeDto response = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeDto.class);
         assertThat(response).isEqualTo(employeeDto1);
@@ -158,7 +172,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$.grade").value(employeeDto1.getGrade().toString()))
               .andExpect(jsonPath("$.mentorId").value(employeeDto1.getMentorId()))
               .andExpect(jsonPath("$.studiesId").value(employeeDto1.getStudiesId()))
-              .andExpect(jsonPath("$.experiencesIds", containsInAnyOrder(1, 2)))
+              .andExpect(jsonPath("$.experiencesIds", contains(1, 2)))
               .andReturn();
         EmployeeDto response = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeDto.class);
         assertThat(response).isEqualTo(employeeDto1);
@@ -186,7 +200,7 @@ class EmployeeRestControllerMockMvcTest {
               .andExpect(jsonPath("$.grade").value(employeeDto2.getGrade().toString()))
               .andExpect(jsonPath("$.mentorId").value(employeeDto2.getMentorId()))
               .andExpect(jsonPath("$.studiesId").value(employeeDto2.getStudiesId()))
-              .andExpect(jsonPath("$.experiencesIds", containsInAnyOrder(3, 4)))
+              .andExpect(jsonPath("$.experiencesIds", contains(3, 4)))
               .andReturn();
         EmployeeDto response = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeDto.class);
         assertThat(response).isEqualTo(employeeDto);

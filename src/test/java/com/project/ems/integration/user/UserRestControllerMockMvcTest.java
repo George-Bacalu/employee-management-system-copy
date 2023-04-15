@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
 import static com.project.ems.mock.UserMock.getMockedUser1;
@@ -66,28 +67,40 @@ class UserRestControllerMockMvcTest {
     @Test
     void getAllUsers_shouldReturnListOfUsers() throws Exception {
         given(userService.getAllUsers()).willReturn(userDtos);
-        MvcResult result = mockMvc.perform(get("/api/users").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(userDto1.getId()))
-              .andExpect(jsonPath("$[0].name").value(userDto1.getName()))
-              .andExpect(jsonPath("$[0].email").value(userDto1.getEmail()))
-              .andExpect(jsonPath("$[0].password").value(userDto1.getPassword()))
-              .andExpect(jsonPath("$[0].mobile").value(userDto1.getMobile()))
-              .andExpect(jsonPath("$[0].address").value(userDto1.getAddress()))
-              .andExpect(jsonPath("$[0].birthday").value(equalTo(userDto1.getBirthday().toString())))
-              .andExpect(jsonPath("$[0].roleId").value(userDto1.getRoleId()))
-              .andExpect(jsonPath("$[1].id").value(userDto2.getId()))
-              .andExpect(jsonPath("$[1].name").value(userDto2.getName()))
-              .andExpect(jsonPath("$[1].email").value(userDto2.getEmail()))
-              .andExpect(jsonPath("$[1].password").value(userDto2.getPassword()))
-              .andExpect(jsonPath("$[1].mobile").value(userDto2.getMobile()))
-              .andExpect(jsonPath("$[1].address").value(userDto2.getAddress()))
-              .andExpect(jsonPath("$[1].birthday").value(equalTo(userDto2.getBirthday().toString())))
-              .andExpect(jsonPath("$[1].roleId").value(userDto2.getRoleId()))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/users").accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
+        for(UserDto userDto : userDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].name").value(userDto.getName()));
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].email").value(userDto.getEmail()));
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].password").value(userDto.getPassword()));
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].mobile").value(userDto.getMobile()));
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].address").value(userDto.getAddress()));
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].birthday").value(userDto.getBirthday().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")].roleId").value(userDto.getRoleId().intValue()));
+        }
+        MvcResult result = actions.andReturn();
         List<UserDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(userDtos);
     }
+
+//    @Test
+//    void getAllUsers_shouldReturnListOfUsers() throws Exception {
+//        given(userService.getAllUsers()).willReturn(userDtos);
+//        MvcResult result = mockMvc.perform(get("/api/users").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(userDto1.getId().intValue(), userDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].name").value(contains(userDto1.getName(), userDto2.getName())))
+//              .andExpect(jsonPath("$[*].email").value(contains(userDto1.getEmail(), userDto2.getEmail())))
+//              .andExpect(jsonPath("$[*].password").value(contains(userDto1.getPassword(), userDto2.getPassword())))
+//              .andExpect(jsonPath("$[*].mobile").value(contains(userDto1.getMobile(), userDto2.getMobile())))
+//              .andExpect(jsonPath("$[*].address").value(contains(userDto1.getAddress(), userDto2.getAddress())))
+//              .andExpect(jsonPath("$[*].birthday").value(contains(userDto1.getBirthday().toString(), userDto2.getBirthday().toString())))
+//              .andExpect(jsonPath("$[*].roleId").value(contains(userDto1.getRoleId().intValue(), userDto2.getRoleId().intValue())))
+//              .andReturn();
+//        List<UserDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(userDtos);
+//    }
 
     @Test
     void getUserById_withValidId_shouldReturnUserWithGivenId() throws Exception {

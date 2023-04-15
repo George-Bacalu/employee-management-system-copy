@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
@@ -66,22 +67,34 @@ class FeedbackRestControllerMockMvcTest {
     @Test
     void getAllFeedbacks_shouldReturnListOfFeedbacks() throws Exception {
         given(feedbackService.getAllFeedbacks()).willReturn(feedbackDtos);
-        MvcResult result = mockMvc.perform(get("/api/feedbacks").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(feedbackDto1.getId()))
-              .andExpect(jsonPath("$[0].feedbackType").value(feedbackDto1.getFeedbackType().toString()))
-              .andExpect(jsonPath("$[0].description").value(feedbackDto1.getDescription()))
-              .andExpect(jsonPath("$[0].sentAt").value(nullValue()))
-              .andExpect(jsonPath("$[0].userId").value(feedbackDto1.getUserId()))
-              .andExpect(jsonPath("$[1].id").value(feedbackDto2.getId()))
-              .andExpect(jsonPath("$[1].feedbackType").value(feedbackDto2.getFeedbackType().toString()))
-              .andExpect(jsonPath("$[1].description").value(feedbackDto2.getDescription()))
-              .andExpect(jsonPath("$[1].sentAt").value(nullValue()))
-              .andExpect(jsonPath("$[1].userId").value(feedbackDto2.getUserId()))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/feedbacks").accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
+        for(FeedbackDto feedbackDto : feedbackDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + feedbackDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + feedbackDto.getId().intValue() + ")].feedbackType").value(feedbackDto.getFeedbackType().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + feedbackDto.getId().intValue() + ")].description").value(feedbackDto.getDescription()));
+            actions.andExpect(jsonPath("$[?(@.id == " + feedbackDto.getId().intValue() + ")].sentAt").value(feedbackDto.getSentAt()));
+            actions.andExpect(jsonPath("$[?(@.id == " + feedbackDto.getId().intValue() + ")].userId").value(feedbackDto.getUserId().intValue()));
+        }
+        MvcResult result = actions.andReturn();
         List<FeedbackDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(feedbackDtos);
     }
+
+//    @Test
+//    void getAllFeedbacks_shouldReturnListOfFeedbacks() throws Exception {
+//        given(feedbackService.getAllFeedbacks()).willReturn(feedbackDtos);
+//        MvcResult result = mockMvc.perform(get("/api/feedbacks").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(feedbackDto1.getId().intValue(), feedbackDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].feedbackType").value(contains(feedbackDto1.getFeedbackType().toString(), feedbackDto2.getFeedbackType().toString())))
+//              .andExpect(jsonPath("$[*].description").value(contains(feedbackDto1.getDescription(), feedbackDto2.getDescription())))
+//              .andExpect(jsonPath("$[*].sentAt").value(contains(nullValue(), nullValue())))
+//              .andExpect(jsonPath("$[*].userId").value(contains(feedbackDto1.getUserId().intValue(), feedbackDto2.getUserId().intValue())))
+//              .andReturn();
+//        List<FeedbackDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(feedbackDtos);
+//    }
 
     @Test
     void getFeedbackById_withValidId_shouldReturnFeedbackWithGivenId() throws Exception {

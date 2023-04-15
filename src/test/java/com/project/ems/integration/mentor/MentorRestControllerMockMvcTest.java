@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.MENTOR_NOT_FOUND;
 import static com.project.ems.mock.MentorMock.getMockedMentor1;
@@ -66,30 +67,42 @@ class MentorRestControllerMockMvcTest {
     @Test
     void getAllMentors_shouldReturnListOfMentors() throws Exception {
         given(mentorService.getAllMentors()).willReturn(mentorDtos);
-        MvcResult result = mockMvc.perform(get("/api/mentors").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(mentorDto1.getId()))
-              .andExpect(jsonPath("$[0].name").value(mentorDto1.getName()))
-              .andExpect(jsonPath("$[0].email").value(mentorDto1.getEmail()))
-              .andExpect(jsonPath("$[0].password").value(mentorDto1.getPassword()))
-              .andExpect(jsonPath("$[0].mobile").value(mentorDto1.getMobile()))
-              .andExpect(jsonPath("$[0].address").value(mentorDto1.getAddress()))
-              .andExpect(jsonPath("$[0].birthday").value(equalTo(mentorDto1.getBirthday().toString())))
-              .andExpect(jsonPath("$[0].isAvailable").value(equalTo(mentorDto1.getIsAvailable())))
-              .andExpect(jsonPath("$[0].numberOfEmployees").value(equalTo(mentorDto1.getNumberOfEmployees())))
-              .andExpect(jsonPath("$[1].id").value(mentorDto2.getId()))
-              .andExpect(jsonPath("$[1].name").value(mentorDto2.getName()))
-              .andExpect(jsonPath("$[1].email").value(mentorDto2.getEmail()))
-              .andExpect(jsonPath("$[1].password").value(mentorDto2.getPassword()))
-              .andExpect(jsonPath("$[1].mobile").value(mentorDto2.getMobile()))
-              .andExpect(jsonPath("$[1].address").value(mentorDto2.getAddress()))
-              .andExpect(jsonPath("$[1].birthday").value(equalTo(mentorDto2.getBirthday().toString())))
-              .andExpect(jsonPath("$[1].isAvailable").value(equalTo(mentorDto2.getIsAvailable())))
-              .andExpect(jsonPath("$[1].numberOfEmployees").value(equalTo(mentorDto2.getNumberOfEmployees())))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/mentors").accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
+        for(MentorDto mentorDto : mentorDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].name").value(mentorDto.getName()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].email").value(mentorDto.getEmail()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].password").value(mentorDto.getPassword()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].mobile").value(mentorDto.getMobile()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].address").value(mentorDto.getAddress()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].birthday").value(mentorDto.getBirthday()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].isAvailable").value(mentorDto.getIsAvailable()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].numberOfEmployees").value(mentorDto.getNumberOfEmployees()));
+        }
+        MvcResult result = actions.andReturn();
         List<MentorDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(mentorDtos);
     }
+
+//    @Test
+//    void getAllMentors_shouldReturnListOfMentors() throws Exception {
+//        given(mentorService.getAllMentors()).willReturn(mentorDtos);
+//        MvcResult result = mockMvc.perform(get("/api/mentors").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(mentorDto1.getId().intValue(), mentorDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].name").value(contains(mentorDto1.getName(), mentorDto2.getName())))
+//              .andExpect(jsonPath("$[*].email").value(contains(mentorDto1.getEmail(), mentorDto2.getEmail())))
+//              .andExpect(jsonPath("$[*].password").value(contains(mentorDto1.getPassword(), mentorDto2.getPassword())))
+//              .andExpect(jsonPath("$[*].mobile").value(contains(mentorDto1.getMobile(), mentorDto2.getMobile())))
+//              .andExpect(jsonPath("$[*].address").value(contains(mentorDto1.getAddress(), mentorDto2.getAddress())))
+//              .andExpect(jsonPath("$[*].birthday").value(contains(mentorDto1.getBirthday().toString(), mentorDto2.getBirthday().toString())))
+//              .andExpect(jsonPath("$[*].isAvailable").value(contains(mentorDto1.getIsAvailable(), mentorDto2.getIsAvailable())))
+//              .andExpect(jsonPath("$[*].numberOfEmployees").value(contains(mentorDto1.getNumberOfEmployees(), mentorDto2.getNumberOfEmployees())))
+//              .andReturn();
+//        List<MentorDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(mentorDtos);
+//    }
 
     @Test
     void getMentorById_withValidId_shouldReturnMentorWithGivenId() throws Exception {

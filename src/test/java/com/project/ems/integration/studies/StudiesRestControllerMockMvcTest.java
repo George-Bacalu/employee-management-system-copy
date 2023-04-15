@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
@@ -65,20 +66,32 @@ class StudiesRestControllerMockMvcTest {
     @Test
     void getAllStudies_shouldReturnListOfStudies() throws Exception {
         given(studiesService.getAllStudies()).willReturn(studiesDtos);
-        MvcResult result = mockMvc.perform(get("/api/studies").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(studiesDto1.getId()))
-              .andExpect(jsonPath("$[0].university").value(studiesDto1.getUniversity()))
-              .andExpect(jsonPath("$[0].faculty").value(studiesDto1.getFaculty()))
-              .andExpect(jsonPath("$[0].major").value(studiesDto1.getMajor()))
-              .andExpect(jsonPath("$[1].id").value(studiesDto2.getId()))
-              .andExpect(jsonPath("$[1].university").value(studiesDto2.getUniversity()))
-              .andExpect(jsonPath("$[1].faculty").value(studiesDto2.getFaculty()))
-              .andExpect(jsonPath("$[1].major").value(studiesDto2.getMajor()))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/studies").accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
+        for(StudiesDto studiesDto : studiesDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + studiesDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + studiesDto.getId().intValue() + ")].university").value(studiesDto.getUniversity()));
+            actions.andExpect(jsonPath("$[?(@.id == " + studiesDto.getId().intValue() + ")].faculty").value(studiesDto.getFaculty()));
+            actions.andExpect(jsonPath("$[?(@.id == " + studiesDto.getId().intValue() + ")].major").value(studiesDto.getMajor()));
+        }
+        MvcResult result = actions.andReturn();
         List<StudiesDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(studiesDtos);
     }
+
+//    @Test
+//    void getAllStudies_shouldReturnListOfStudies() throws Exception {
+//        given(studiesService.getAllStudies()).willReturn(studiesDtos);
+//        MvcResult result = mockMvc.perform(get("/api/studies").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(studiesDto1.getId().intValue(), studiesDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].university").value(contains(studiesDto1.getUniversity(), studiesDto2.getUniversity())))
+//              .andExpect(jsonPath("$[*].faculty").value(contains(studiesDto1.getFaculty(), studiesDto2.getFaculty())))
+//              .andExpect(jsonPath("$[*].major").value(contains(studiesDto1.getMajor(), studiesDto2.getMajor())))
+//              .andReturn();
+//        List<StudiesDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(studiesDtos);
+//    }
 
     @Test
     void getStudiesById_withValidId_shouldReturnStudiesWithGivenId() throws Exception {

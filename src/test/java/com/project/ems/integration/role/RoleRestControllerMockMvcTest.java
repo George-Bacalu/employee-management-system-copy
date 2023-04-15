@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.ROLE_NOT_FOUND;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
@@ -65,16 +66,28 @@ class RoleRestControllerMockMvcTest {
     @Test
     void getAllRoles_shouldReturnListOfRoles() throws Exception {
         given(roleService.getAllRoles()).willReturn(roleDtos);
-        MvcResult result = mockMvc.perform(get("/api/roles").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(roleDto1.getId()))
-              .andExpect(jsonPath("$[0].name").value(roleDto1.getName()))
-              .andExpect(jsonPath("$[1].id").value(roleDto2.getId()))
-              .andExpect(jsonPath("$[1].name").value(roleDto2.getName()))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/roles").accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
+        for(RoleDto roleDto : roleDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + roleDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + roleDto.getId().intValue() + ")].name").value(roleDto.getName()));
+        }
+        MvcResult result = actions.andReturn();
         List<RoleDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(roleDtos);
     }
+
+//    @Test
+//    void getAllRoles_shouldReturnListOfRoles() throws Exception {
+//        given(roleService.getAllRoles()).willReturn(roleDtos);
+//        MvcResult result = mockMvc.perform(get("/api/roles").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(roleDto1.getId().intValue(), roleDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].name").value(contains(roleDto1.getName(), roleDto2.getName())))
+//              .andReturn();
+//        List<RoleDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(roleDtos);
+//    }
 
     @Test
     void getRoleById_withValidId_shouldReturnRolesWithGivenId() throws Exception {

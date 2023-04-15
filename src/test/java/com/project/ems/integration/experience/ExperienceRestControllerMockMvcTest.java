@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
@@ -65,24 +66,36 @@ class ExperienceRestControllerMockMvcTest {
     @Test
     void getAllExperiences_shouldReturnListOfExperiences() throws Exception {
         given(experienceService.getAllExperiences()).willReturn(experienceDtos);
-        MvcResult result = mockMvc.perform(get("/api/experiences").accept(APPLICATION_JSON_VALUE))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$[0].id").value(experienceDto1.getId()))
-              .andExpect(jsonPath("$[0].title").value(experienceDto1.getTitle()))
-              .andExpect(jsonPath("$[0].organization").value(experienceDto1.getOrganization()))
-              .andExpect(jsonPath("$[0].experienceType").value(experienceDto1.getExperienceType().toString()))
-              .andExpect(jsonPath("$[0].startedAt").value(experienceDto1.getStartedAt().toString()))
-              .andExpect(jsonPath("$[0].finishedAt").value(experienceDto1.getFinishedAt().toString()))
-              .andExpect(jsonPath("$[1].id").value(experienceDto2.getId()))
-              .andExpect(jsonPath("$[1].title").value(experienceDto2.getTitle()))
-              .andExpect(jsonPath("$[1].organization").value(experienceDto2.getOrganization()))
-              .andExpect(jsonPath("$[1].experienceType").value(experienceDto2.getExperienceType().toString()))
-              .andExpect(jsonPath("$[1].startedAt").value(experienceDto2.getStartedAt().toString()))
-              .andExpect(jsonPath("$[1].finishedAt").value(experienceDto2.getFinishedAt().toString()))
-              .andReturn();
+        ResultActions actions = mockMvc.perform(get("/api/experiences").accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
+        for(ExperienceDto experienceDto : experienceDtos) {
+            actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")]").exists());
+            actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")].title").value(experienceDto.getTitle()));
+            actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")].organization").value(experienceDto.getOrganization()));
+            actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")].experienceType").value(experienceDto.getExperienceType().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")].startedAt").value(experienceDto.getStartedAt().toString()));
+            actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")].finishedAt").value(experienceDto.getFinishedAt().toString()));
+        }
+        MvcResult result = actions.andReturn();
         List<ExperienceDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertThat(response).isEqualTo(experienceDtos);
     }
+
+//    @Test
+//    void getAllExperiences_shouldReturnListOfExperiences() throws Exception {
+//        given(experienceService.getAllExperiences()).willReturn(experienceDtos);
+//        MvcResult result = mockMvc.perform(get("/api/experiences").accept(APPLICATION_JSON_VALUE))
+//              .andExpect(status().isOk())
+//              .andExpect(jsonPath("$[*].id").value(contains(experienceDto1.getId().intValue(), experienceDto2.getId().intValue())))
+//              .andExpect(jsonPath("$[*].title").value(contains(experienceDto1.getTitle(), experienceDto2.getTitle())))
+//              .andExpect(jsonPath("$[*].organization").value(contains(experienceDto1.getOrganization(), experienceDto2.getOrganization())))
+//              .andExpect(jsonPath("$[*].experienceType").value(contains(experienceDto1.getExperienceType().toString(), experienceDto2.getExperienceType().toString())))
+//              .andExpect(jsonPath("$[*].startedAt").value(contains(experienceDto1.getStartedAt().toString(), experienceDto2.getStartedAt().toString())))
+//              .andExpect(jsonPath("$[*].finishedAt").value(contains(experienceDto1.getFinishedAt().toString(), experienceDto2.getFinishedAt().toString())))
+//              .andReturn();
+//        List<ExperienceDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+//        assertThat(response).isEqualTo(experienceDtos);
+//    }
 
     @Test
     void getExperienceById_withValidId_shouldReturnExperienceWithGivenId() throws Exception {
