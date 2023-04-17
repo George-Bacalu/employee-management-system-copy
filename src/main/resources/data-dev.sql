@@ -1,21 +1,3 @@
-INSERT INTO mentors (name, email, password, mobile, address, birthday, is_available, number_of_employees) VALUES
-('test_mentor_name1', 'test_mentor_email1@email.com', '#Test_mentor_password1', '+40700000001', 'test_mentor_address1', '1990-01-01', true, 5),
-('test_mentor_name2', 'test_mentor_email2@email.com', '#Test_mentor_password2', '+40700000002', 'test_mentor_address2', '1990-01-02', true, 5),
-('test_mentor_name3', 'test_mentor_email3@email.com', '#Test_mentor_password3', '+40700000003', 'test_mentor_address3', '1990-01-03', true, 5),
-('test_mentor_name4', 'test_mentor_email4@email.com', '#Test_mentor_password4', '+40700000004', 'test_mentor_address4', '1990-01-04', true, 5);
-
-INSERT INTO studies(university, faculty, major) VALUES
-('test_university1', 'test_faculty1', 'test_major1'),
-('test_university2', 'test_faculty2', 'test_major2'),
-('test_university3', 'test_faculty3', 'test_major3'),
-('test_university4', 'test_faculty4', 'test_major4');
-
-INSERT INTO experiences(title, organization, experience_type, started_at, finished_at) VALUES
-('test_experience_title1', 'test_experience_organization1', 'APPRENTICESHIP', '1990-01-01', '1991-01-01'),
-('test_experience_title2', 'test_experience_organization2', 'INTERNSHIP', '1992-01-01', '1993-01-01'),
-('test_experience_title3', 'test_experience_organization3', 'TRAINING', '1994-01-01', '1995-01-01'),
-('test_experience_title4', 'test_experience_organization4', 'VOLUNTEERING', '1996-01-01', '1997-01-01');
-
 INSERT INTO roles(name) VALUES ('USER'), ('ADMIN');
 
 INSERT INTO users(name, email, password, mobile, address, birthday, role_id) VALUES
@@ -51,6 +33,24 @@ INSERT INTO feedbacks(feedback_type, description, sent_at, user_id) VALUES
 ('BUG', 'test_feedback_description4', '1990-01-04 00:00', 4),
 ('OPTIMIZATION', 'test_feedback_description5', '1990-01-05 00:00', 5),
 ('IMPROVEMENT', 'test_feedback_description6', '1990-01-06 00:00', 6);
+
+INSERT INTO mentors (name, email, password, mobile, address, birthday, is_available, number_of_employees) VALUES
+('test_mentor_name1', 'test_mentor_email1@email.com', '#Test_mentor_password1', '+40700000001', 'test_mentor_address1', '1990-01-01', true, 5),
+('test_mentor_name2', 'test_mentor_email2@email.com', '#Test_mentor_password2', '+40700000002', 'test_mentor_address2', '1990-01-02', true, 5),
+('test_mentor_name3', 'test_mentor_email3@email.com', '#Test_mentor_password3', '+40700000003', 'test_mentor_address3', '1990-01-03', true, 5),
+('test_mentor_name4', 'test_mentor_email4@email.com', '#Test_mentor_password4', '+40700000004', 'test_mentor_address4', '1990-01-04', true, 5);
+
+INSERT INTO studies(university, faculty, major) VALUES
+('test_university1', 'test_faculty1', 'test_major1'),
+('test_university2', 'test_faculty2', 'test_major2'),
+('test_university3', 'test_faculty3', 'test_major3'),
+('test_university4', 'test_faculty4', 'test_major4');
+
+INSERT INTO experiences(title, organization, experience_type, started_at, finished_at) VALUES
+('test_experience_title1', 'test_experience_organization1', 'APPRENTICESHIP', '1990-01-01', '1991-01-01'),
+('test_experience_title2', 'test_experience_organization2', 'INTERNSHIP', '1992-01-01', '1993-01-01'),
+('test_experience_title3', 'test_experience_organization3', 'TRAINING', '1994-01-01', '1995-01-01'),
+('test_experience_title4', 'test_experience_organization4', 'VOLUNTEERING', '1996-01-01', '1997-01-01');
 
 INSERT INTO employees(name, email, password, mobile, address, birthday, job_type, position, grade, mentor_id, studies_id) VALUES
 ('test_employee_name1', 'test_employee_email1@email.com', '#Test_employee_password1', '+40700000001', 'test_employee_address1', '1990-01-01', 'FULL_TIME', 'BACKEND', 'JUNIOR', 1, 1),

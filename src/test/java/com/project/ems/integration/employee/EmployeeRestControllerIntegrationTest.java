@@ -72,14 +72,14 @@ class EmployeeRestControllerIntegrationTest {
             modelMapper.map(employee, EmployeeDto.class).setExperiencesIds(employee.getExperiences().stream().map(Experience::getId).toList());
         }
 
-        jdbcTemplate.update("truncate table roles cascade");
-        jdbcTemplate.update("truncate table users cascade");
-        jdbcTemplate.update("truncate table feedbacks cascade");
-        jdbcTemplate.update("truncate table mentors cascade");
-        jdbcTemplate.update("truncate table studies cascade");
-        jdbcTemplate.update("truncate table experiences cascade");
-        jdbcTemplate.update("truncate table employees cascade");
-        jdbcTemplate.update("truncate table employees_experiences cascade");
+        jdbcTemplate.update("delete from employees_experiences");
+        jdbcTemplate.update("delete from employees");
+        jdbcTemplate.update("delete from experiences");
+        jdbcTemplate.update("delete from studies");
+        jdbcTemplate.update("delete from mentors");
+        jdbcTemplate.update("delete from feedbacks");
+        jdbcTemplate.update("delete from users");
+        jdbcTemplate.update("delete from roles");
         var resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource("data-test.sql"));
         resourceDatabasePopulator.execute(Objects.requireNonNull(jdbcTemplate.getDataSource()));
