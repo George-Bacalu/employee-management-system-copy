@@ -3,9 +3,8 @@ package com.project.ems.integration.studies;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.studies.StudiesDto;
-import com.project.ems.studies.StudiesRepository;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +13,17 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
@@ -30,22 +33,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "classpath:data-test.sql")
 class StudiesRestControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
 
     @Autowired
-    private StudiesRepository studiesRepository;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    private TransactionStatus transactionStatus;
 
     private StudiesDto studiesDto1;
     private StudiesDto studiesDto2;
@@ -56,11 +62,25 @@ class StudiesRestControllerIntegrationTest {
         studiesDto1 = modelMapper.map(getMockedStudies1(), StudiesDto.class);
         studiesDto2 = modelMapper.map(getMockedStudies2(), StudiesDto.class);
         studiesDtos = modelMapper.map(getMockedStudies(), new TypeToken<List<StudiesDto>>() {}.getType());
+
+        jdbcTemplate.update("truncate table roles cascade");
+        jdbcTemplate.update("truncate table users cascade");
+        jdbcTemplate.update("truncate table feedbacks cascade");
+        jdbcTemplate.update("truncate table mentors cascade");
+        jdbcTemplate.update("truncate table studies cascade");
+        jdbcTemplate.update("truncate table experiences cascade");
+        jdbcTemplate.update("truncate table employees cascade");
+        jdbcTemplate.update("truncate table employees_experiences cascade");
+        var resourceDatabasePopulator = new ResourceDatabasePopulator();
+        resourceDatabasePopulator.addScript(new ClassPathResource("data-test.sql"));
+        resourceDatabasePopulator.execute(Objects.requireNonNull(jdbcTemplate.getDataSource()));
+
+        transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
     }
 
     @AfterEach
     void tearDown() {
-        studiesRepository.deleteAll();
+        transactionManager.rollback(transactionStatus);
     }
 
     @Test
@@ -70,7 +90,6 @@ class StudiesRestControllerIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         List<StudiesDto> result = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-        Collections.reverse(studiesDtos);
         assertThat(result).isEqualTo(studiesDtos);
     }
 

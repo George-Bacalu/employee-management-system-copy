@@ -51,7 +51,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPassword(employeeDto.getPassword());
         employee.setMobile(employeeDto.getMobile());
         employee.setAddress(employeeDto.getAddress());
-        employee.setBirthday(employeeDto.getBirthday());
+        if(employeeDto.getBirthday() != null)
+            employee.setBirthday(employeeDto.getBirthday());
         employee.setJobType(employeeDto.getJobType());
         employee.setPosition(employeeDto.getPosition());
         employee.setGrade(employeeDto.getGrade());

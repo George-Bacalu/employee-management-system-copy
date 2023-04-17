@@ -3,9 +3,8 @@ package com.project.ems.integration.feedback;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.feedback.FeedbackDto;
-import com.project.ems.feedback.FeedbackRepository;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +13,17 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
@@ -30,9 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "classpath:data-test.sql")
 class FeedbackRestControllerIntegrationTest {
 
     @Autowired
@@ -42,10 +43,15 @@ class FeedbackRestControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private FeedbackRepository feedbackRepository;
+    private ModelMapper modelMapper;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    private TransactionStatus transactionStatus;
 
     private FeedbackDto feedbackDto1;
     private FeedbackDto feedbackDto2;
@@ -56,11 +62,25 @@ class FeedbackRestControllerIntegrationTest {
         feedbackDto1 = modelMapper.map(getMockedFeedback1(), FeedbackDto.class);
         feedbackDto2 = modelMapper.map(getMockedFeedback2(), FeedbackDto.class);
         feedbackDtos = modelMapper.map(getMockedFeedbacks(), new TypeToken<List<FeedbackDto>>() {}.getType());
+
+        jdbcTemplate.update("truncate table roles cascade");
+        jdbcTemplate.update("truncate table users cascade");
+        jdbcTemplate.update("truncate table feedbacks cascade");
+        jdbcTemplate.update("truncate table mentors cascade");
+        jdbcTemplate.update("truncate table studies cascade");
+        jdbcTemplate.update("truncate table experiences cascade");
+        jdbcTemplate.update("truncate table employees cascade");
+        jdbcTemplate.update("truncate table employees_experiences cascade");
+        var resourceDatabasePopulator = new ResourceDatabasePopulator();
+        resourceDatabasePopulator.addScript(new ClassPathResource("data-test.sql"));
+        resourceDatabasePopulator.execute(Objects.requireNonNull(jdbcTemplate.getDataSource()));
+
+        transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
     }
 
     @AfterEach
     void tearDown() {
-        feedbackRepository.deleteAll();
+        transactionManager.rollback(transactionStatus);
     }
 
     @Test
@@ -70,7 +90,6 @@ class FeedbackRestControllerIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         List<FeedbackDto> result = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-        Collections.reverse(feedbackDtos);
         assertThat(result).isEqualTo(feedbackDtos);
     }
 
@@ -99,21 +118,31 @@ class FeedbackRestControllerIntegrationTest {
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).isEqualTo(feedbackDto1);
+        FeedbackDto result = response.getBody();
+        assertThat(Objects.requireNonNull(result).getId()).isEqualTo(feedbackDto1.getId());
+        assertThat(result.getFeedbackType()).isEqualTo(feedbackDto1.getFeedbackType());
+        assertThat(result.getDescription()).isEqualTo(feedbackDto1.getDescription());
+        assertThat(result.getUserId()).isEqualTo(feedbackDto1.getUserId());
+        assertNotNull(result.getSentAt());
     }
 
     @Test
     void updateFeedbackById_withValidId_shouldUpdateFeedbackWithGivenId() {
         Long id = 1L;
-        FeedbackDto FeedbackDto = feedbackDto2;
-        FeedbackDto.setId(id);
+        FeedbackDto feedbackDto = feedbackDto2;
+        feedbackDto.setId(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
         ResponseEntity<FeedbackDto> response = template.exchange("/api/feedbacks/1", HttpMethod.PUT, new HttpEntity<>(feedbackDto2, headers), FeedbackDto.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).isEqualTo(FeedbackDto);
+        FeedbackDto result = response.getBody();
+        assertThat(Objects.requireNonNull(result).getId()).isEqualTo(feedbackDto.getId());
+        assertThat(result.getFeedbackType()).isEqualTo(feedbackDto.getFeedbackType());
+        assertThat(result.getDescription()).isEqualTo(feedbackDto.getDescription());
+        assertThat(result.getUserId()).isEqualTo(feedbackDto.getUserId());
+        assertNotNull(result.getSentAt());
     }
 
     @Test

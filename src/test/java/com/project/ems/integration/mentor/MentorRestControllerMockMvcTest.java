@@ -76,7 +76,7 @@ class MentorRestControllerMockMvcTest {
             actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].password").value(mentorDto.getPassword()));
             actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].mobile").value(mentorDto.getMobile()));
             actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].address").value(mentorDto.getAddress()));
-            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].birthday").value(mentorDto.getBirthday()));
+            actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].birthday").value(mentorDto.getBirthday().toString()));
             actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].isAvailable").value(mentorDto.getIsAvailable()));
             actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")].numberOfEmployees").value(mentorDto.getNumberOfEmployees()));
         }

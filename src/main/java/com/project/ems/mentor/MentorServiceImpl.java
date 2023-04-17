@@ -43,8 +43,10 @@ public class MentorServiceImpl implements MentorService {
         mentor.setPassword(mentorDto.getPassword());
         mentor.setMobile(mentorDto.getMobile());
         mentor.setAddress(mentorDto.getAddress());
-        mentor.setBirthday(mentorDto.getBirthday());
-        mentor.setIsAvailable(mentorDto.getIsAvailable());
+        if(mentor.getBirthday() != null)
+            mentor.setBirthday(mentorDto.getBirthday());
+        if(mentor.getIsAvailable() != null)
+            mentor.setIsAvailable(mentorDto.getIsAvailable());
         mentor.setNumberOfEmployees(mentorDto.getNumberOfEmployees());
         Mentor updatedMentor = mentorRepository.save(mentor);
         return modelMapper.map(updatedMentor, MentorDto.class);

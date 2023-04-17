@@ -118,6 +118,7 @@ class FeedbackServiceIntegrationTest {
         Long id = 1L;
         Feedback feedback = feedback2;
         feedback.setId(id);
+        feedback.setSentAt(feedback1.getSentAt());
         given(feedbackRepository.findById(anyLong())).willReturn(Optional.ofNullable(feedback1));
         given(userService.getUserEntityById(anyLong())).willReturn(user);
         given(feedbackRepository.save(any(Feedback.class))).willReturn(feedback);

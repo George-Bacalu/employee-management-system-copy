@@ -13,16 +13,10 @@ public class RoleMock {
     }
 
     public static Role getMockedRole1() {
-        return Role.builder()
-              .id(1L)
-              .name("test_role_name1")
-              .build();
+        return Role.builder().id(1L).name("USER").build();
     }
 
     public static Role getMockedRole2() {
-        return Role.builder()
-              .id(2L)
-              .name("test_role_name2")
-              .build();
+        return Role.builder().id(2L).name("ADMIN").build();
     }
 }
