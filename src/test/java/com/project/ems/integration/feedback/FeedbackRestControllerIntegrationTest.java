@@ -1,14 +1,11 @@
 package com.project.ems.integration.feedback;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.exception.ErrorResponse;
 import com.project.ems.feedback.FeedbackDto;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -16,17 +13,11 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.test.context.jdbc.Sql;
 
 import static com.project.ems.constants.Constants.API_FEEDBACKS;
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
@@ -38,28 +29,25 @@ import static com.project.ems.mock.FeedbackMock.getMockedFeedback2;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "classpath:data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class FeedbackRestControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private ModelMapper modelMapper;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    private TransactionStatus transactionStatus;
 
     private FeedbackDto feedbackDto1;
     private FeedbackDto feedbackDto2;
@@ -70,41 +58,22 @@ class FeedbackRestControllerIntegrationTest {
         feedbackDto1 = modelMapper.map(getMockedFeedback1(), FeedbackDto.class);
         feedbackDto2 = modelMapper.map(getMockedFeedback2(), FeedbackDto.class);
         feedbackDtos = modelMapper.map(getMockedFeedbacks(), new TypeToken<List<FeedbackDto>>() {}.getType());
-
-        jdbcTemplate.update("delete from employees_experiences");
-        jdbcTemplate.update("delete from employees");
-        jdbcTemplate.update("delete from experiences");
-        jdbcTemplate.update("delete from studies");
-        jdbcTemplate.update("delete from mentors");
-        jdbcTemplate.update("delete from feedbacks");
-        jdbcTemplate.update("delete from users");
-        jdbcTemplate.update("delete from roles");
-        var resourceDatabasePopulator = new ResourceDatabasePopulator();
-        resourceDatabasePopulator.addScript(new ClassPathResource("data-test.sql"));
-        resourceDatabasePopulator.execute(Objects.requireNonNull(jdbcTemplate.getDataSource()));
-        transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
-    }
-
-    @AfterEach
-    void tearDown() {
-        transactionManager.rollback(transactionStatus);
     }
 
     @Test
-    void getAllFeedbacks_shouldReturnListOfFeedbacks() throws Exception {
-        ResponseEntity<String> response = template.getForEntity(API_FEEDBACKS, String.class);
+    void getAllFeedbacks_shouldReturnListOfFeedbacks() {
+        ResponseEntity<List<FeedbackDto>> response = template.exchange(API_FEEDBACKS, GET, null, new ParameterizedTypeReference<>() {});
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        List<FeedbackDto> result = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-        assertThat(result).isEqualTo(feedbackDtos);
+        assertThat(response.getBody()).isEqualTo(feedbackDtos);
     }
 
     @Test
     void getFeedbackById_withValidId_shouldReturnFeedbackWithGivenId() {
         ResponseEntity<FeedbackDto> response = template.getForEntity(API_FEEDBACKS + "/" + VALID_ID, FeedbackDto.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         assertThat(response.getBody()).isEqualTo(feedbackDto1);
     }
@@ -113,7 +82,7 @@ class FeedbackRestControllerIntegrationTest {
     void getFeedbackById_withInvalidId_shouldThrowException() {
         ResponseEntity<ErrorResponse> response = template.getForEntity(API_FEEDBACKS + "/" + INVALID_ID, ErrorResponse.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         ErrorResponse result = Objects.requireNonNull(response.getBody());
         assertThat(result.getStatusCode()).isEqualTo(NOT_FOUND.value());
@@ -125,7 +94,7 @@ class FeedbackRestControllerIntegrationTest {
     void saveFeedback_shouldAddFeedbackToList() {
         ResponseEntity<FeedbackDto> response = template.postForEntity(API_FEEDBACKS, feedbackDto1, FeedbackDto.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         FeedbackDto result = response.getBody();
         assertThat(Objects.requireNonNull(result).getId()).isEqualTo(feedbackDto1.getId());
@@ -139,9 +108,9 @@ class FeedbackRestControllerIntegrationTest {
     void updateFeedbackById_withValidId_shouldUpdateFeedbackWithGivenId() {
         FeedbackDto feedbackDto = feedbackDto2; feedbackDto.setId(VALID_ID);
         HttpHeaders headers = new HttpHeaders(); headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<FeedbackDto> response = template.exchange(API_FEEDBACKS + "/" + VALID_ID, HttpMethod.PUT, new HttpEntity<>(feedbackDto2, headers), FeedbackDto.class);
+        ResponseEntity<FeedbackDto> response = template.exchange(API_FEEDBACKS + "/" + VALID_ID, PUT, new HttpEntity<>(feedbackDto2, headers), FeedbackDto.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         FeedbackDto result = response.getBody();
         assertThat(Objects.requireNonNull(result).getId()).isEqualTo(feedbackDto.getId());
@@ -154,9 +123,9 @@ class FeedbackRestControllerIntegrationTest {
     @Test
     void updateFeedbackById_withInvalidId_shouldThrowException() {
         HttpHeaders headers = new HttpHeaders(); headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<ErrorResponse> response = template.exchange(API_FEEDBACKS + "/" + INVALID_ID, HttpMethod.PUT, new HttpEntity<>(feedbackDto2, headers), ErrorResponse.class);
+        ResponseEntity<ErrorResponse> response = template.exchange(API_FEEDBACKS + "/" + INVALID_ID, PUT, new HttpEntity<>(feedbackDto2, headers), ErrorResponse.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         ErrorResponse result = Objects.requireNonNull(response.getBody());
         assertThat(result.getStatusCode()).isEqualTo(NOT_FOUND.value());
@@ -166,21 +135,21 @@ class FeedbackRestControllerIntegrationTest {
 
     @Test
     void deleteFeedbackById_withValidId_shouldRemoveFeedbackWithGivenIdFromList() {
-        ResponseEntity<Void> response = template.exchange(API_FEEDBACKS + "/" + VALID_ID, HttpMethod.DELETE, new HttpEntity<>(null), Void.class);
+        ResponseEntity<Void> response = template.exchange(API_FEEDBACKS + "/" + VALID_ID, DELETE, new HttpEntity<>(null), Void.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        ResponseEntity<Void> getResponse = template.exchange(API_FEEDBACKS + "/" + VALID_ID, HttpMethod.GET, null, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
+        ResponseEntity<Void> getResponse = template.exchange(API_FEEDBACKS + "/" + VALID_ID, GET, null, Void.class);
         assertNotNull(getResponse);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        ResponseEntity<Void> getAllResponse = template.exchange(API_FEEDBACKS, HttpMethod.GET, null, Void.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(NOT_FOUND);
+        ResponseEntity<Void> getAllResponse = template.exchange(API_FEEDBACKS, GET, null, Void.class);
         assertNotNull(getAllResponse);
     }
 
     @Test
     void deleteFeedbackById_withInvalidId_shouldThrowException() {
-        ResponseEntity<ErrorResponse> response = template.exchange(API_FEEDBACKS + "/" + INVALID_ID, HttpMethod.DELETE, new HttpEntity<>(null), ErrorResponse.class);
+        ResponseEntity<ErrorResponse> response = template.exchange(API_FEEDBACKS + "/" + INVALID_ID, DELETE, new HttpEntity<>(null), ErrorResponse.class);
         assertNotNull(response);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         ErrorResponse result = Objects.requireNonNull(response.getBody());
         assertThat(result.getStatusCode()).isEqualTo(NOT_FOUND.value());
