@@ -1,5 +1,6 @@
 package com.project.ems.user;
 
+import com.project.ems.person.Person;
 import com.project.ems.role.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,43 +9,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
-
-    private String email;
-
-    private String password;
-
-    private String mobile;
-
-    private String address;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthday;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
