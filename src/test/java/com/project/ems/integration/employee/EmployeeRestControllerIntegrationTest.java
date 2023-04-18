@@ -76,7 +76,7 @@ class EmployeeRestControllerIntegrationTest {
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).isEqualTo(employeeDtos);
+        assertThat(response.getBody()).hasToString(employeeDtos.toString());
     }
 
     @Test

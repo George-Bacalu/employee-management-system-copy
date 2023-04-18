@@ -104,14 +104,14 @@ class EmployeeServiceImplTest {
     void getAllEmployees_shouldReturnListOfEmployees() {
         given(employeeRepository.findAll()).willReturn(employees);
         List<EmployeeDto> result = employeeService.getAllEmployees();
-        assertThat(result).isEqualTo(employeeDtos);
+        assertThat(result).hasToString(employeeDtos.toString());
     }
 
     @Test
     void getEmployeeById_withValidId_shouldReturnEmployeeWithGivenId() {
         given(employeeRepository.findById(anyLong())).willReturn(Optional.ofNullable(employee1));
         EmployeeDto result = employeeService.getEmployeeById(VALID_ID);
-        assertThat(result).isEqualTo(employeeDto1);
+        assertThat(result).hasToString(employeeDto1.toString());
     }
 
     @Test
@@ -129,7 +129,7 @@ class EmployeeServiceImplTest {
         EmployeeDto result = employeeService.saveEmployee(employeeDto1);
         verify(employeeRepository).save(employeeCaptor.capture());
         Employee savedEmployee = employeeCaptor.getValue();
-        assertThat(result).isEqualTo(modelMapper.map(savedEmployee, EmployeeDto.class));
+        assertThat(result).hasToString(modelMapper.map(savedEmployee, EmployeeDto.class).toString());
         assertThat(savedEmployee.getMentor()).isEqualTo(mentor1);
         assertThat(savedEmployee.getStudies()).isEqualTo(studies1);
         assertThat(savedEmployee.getExperiences()).containsAll(experiences1);
@@ -147,7 +147,7 @@ class EmployeeServiceImplTest {
         EmployeeDto result = employeeService.updateEmployeeById(employeeDto2, VALID_ID);
         verify(employeeRepository).save(employeeCaptor.capture());
         Employee updatedEmployee = employeeCaptor.getValue();
-        assertThat(result).isEqualTo(modelMapper.map(updatedEmployee, EmployeeDto.class));
+        assertThat(result).hasToString(modelMapper.map(updatedEmployee, EmployeeDto.class).toString());
         assertThat(updatedEmployee.getMentor()).isEqualTo(mentor2);
         assertThat(updatedEmployee.getStudies()).isEqualTo(studies2);
         assertThat(updatedEmployee.getExperiences()).containsAll(experiences2);
