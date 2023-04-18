@@ -19,7 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.project.ems.constants.Constants.API_EXPERIENCES;
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
+import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience2;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
@@ -66,7 +69,7 @@ class ExperienceRestControllerMockMvcTest {
     @Test
     void getAllExperiences_shouldReturnListOfExperiences() throws Exception {
         given(experienceService.getAllExperiences()).willReturn(experienceDtos);
-        ResultActions actions = mockMvc.perform(get("/api/experiences").accept(APPLICATION_JSON_VALUE))
+        ResultActions actions = mockMvc.perform(get(API_EXPERIENCES).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk());
         for(ExperienceDto experienceDto : experienceDtos) {
             actions.andExpect(jsonPath("$[?(@.id == " + experienceDto.getId().intValue() + ")]").exists());
@@ -81,27 +84,10 @@ class ExperienceRestControllerMockMvcTest {
         assertThat(response).isEqualTo(experienceDtos);
     }
 
-//    @Test
-//    void getAllExperiences_shouldReturnListOfExperiences() throws Exception {
-//        given(experienceService.getAllExperiences()).willReturn(experienceDtos);
-//        MvcResult result = mockMvc.perform(get("/api/experiences").accept(APPLICATION_JSON_VALUE))
-//              .andExpect(status().isOk())
-//              .andExpect(jsonPath("$[*].id").value(contains(experienceDto1.getId().intValue(), experienceDto2.getId().intValue())))
-//              .andExpect(jsonPath("$[*].title").value(contains(experienceDto1.getTitle(), experienceDto2.getTitle())))
-//              .andExpect(jsonPath("$[*].organization").value(contains(experienceDto1.getOrganization(), experienceDto2.getOrganization())))
-//              .andExpect(jsonPath("$[*].experienceType").value(contains(experienceDto1.getExperienceType().toString(), experienceDto2.getExperienceType().toString())))
-//              .andExpect(jsonPath("$[*].startedAt").value(contains(experienceDto1.getStartedAt().toString(), experienceDto2.getStartedAt().toString())))
-//              .andExpect(jsonPath("$[*].finishedAt").value(contains(experienceDto1.getFinishedAt().toString(), experienceDto2.getFinishedAt().toString())))
-//              .andReturn();
-//        List<ExperienceDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
-//        assertThat(response).isEqualTo(experienceDtos);
-//    }
-
     @Test
     void getExperienceById_withValidId_shouldReturnExperienceWithGivenId() throws Exception {
-        Long id = 1L;
         given(experienceService.getExperienceById(anyLong())).willReturn(experienceDto1);
-        MvcResult result = mockMvc.perform(get("/api/experiences/{id}", id).accept(APPLICATION_JSON_VALUE))
+        MvcResult result = mockMvc.perform(get(API_EXPERIENCES + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(experienceDto1.getId()))
               .andExpect(jsonPath("$.title").value(experienceDto1.getTitle()))
@@ -116,9 +102,8 @@ class ExperienceRestControllerMockMvcTest {
 
     @Test
     void getExperienceById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(experienceService.getExperienceById(anyLong())).willThrow(new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, id)));
-        mockMvc.perform(get("/api/experience/{id}", id).accept(APPLICATION_JSON_VALUE))
+        given(experienceService.getExperienceById(anyLong())).willThrow(new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(get(API_EXPERIENCES + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }
@@ -126,7 +111,7 @@ class ExperienceRestControllerMockMvcTest {
     @Test
     void saveExperience_shouldAddExperienceToList() throws Exception {
         given(experienceService.saveExperience(any(ExperienceDto.class))).willReturn(experienceDto1);
-        MvcResult result = mockMvc.perform(post("/api/experiences").accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(post(API_EXPERIENCES).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(experienceDto1)))
               .andExpect(status().isCreated())
@@ -143,11 +128,9 @@ class ExperienceRestControllerMockMvcTest {
 
     @Test
     void updateExperienceById_withValidId_shouldUpdateExperienceWithGivenId() throws Exception {
-        Long id = 1L;
-        ExperienceDto experienceDto = experienceDto2;
-        experienceDto.setId(id);
+        ExperienceDto experienceDto = experienceDto2; experienceDto.setId(VALID_ID);
         given(experienceService.updateExperienceById(any(ExperienceDto.class), anyLong())).willReturn(experienceDto);
-        MvcResult result = mockMvc.perform(put("/api/experiences/{id}", id).accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(put(API_EXPERIENCES + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(experienceDto1)))
               .andExpect(status().isOk())
@@ -164,9 +147,8 @@ class ExperienceRestControllerMockMvcTest {
 
     @Test
     void updateExperienceById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(experienceService.updateExperienceById(any(ExperienceDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, id)));
-        mockMvc.perform(put("/api/experiences/{id}", id).accept(APPLICATION_JSON_VALUE)
+        given(experienceService.updateExperienceById(any(ExperienceDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(put(API_EXPERIENCES + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(experienceDto1)))
               .andExpect(status().isNotFound())
@@ -175,18 +157,16 @@ class ExperienceRestControllerMockMvcTest {
 
     @Test
     void deleteExperienceById_withValidId_shouldRemoveExperienceWithGivenIdFromList() throws Exception {
-        Long id = 1L;
-        mockMvc.perform(delete("/api/experiences/{id}", id).accept(APPLICATION_JSON_VALUE))
+        mockMvc.perform(delete(API_EXPERIENCES + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNoContent())
               .andReturn();
-        verify(experienceService).deleteExperienceById(id);
+        verify(experienceService).deleteExperienceById(VALID_ID);
     }
 
     @Test
     void deleteExperienceById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        doThrow(new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, id))).when(experienceService).deleteExperienceById(id);
-        mockMvc.perform(delete("/api/experiences/{id}", id).accept(APPLICATION_JSON_VALUE))
+        doThrow(new ResourceNotFoundException(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID))).when(experienceService).deleteExperienceById(anyLong());
+        mockMvc.perform(delete(API_EXPERIENCES + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }

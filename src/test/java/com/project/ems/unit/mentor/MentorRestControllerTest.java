@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.MentorMock.getMockedMentor1;
 import static com.project.ems.mock.MentorMock.getMockedMentor2;
 import static com.project.ems.mock.MentorMock.getMockedMentors;
@@ -60,9 +61,8 @@ class MentorRestControllerTest {
 
     @Test
     void getMentorById_shouldReturnMentorWithGivenId() {
-        Long id = 1L;
         given(mentorService.getMentorById(anyLong())).willReturn(mentorDto1);
-        ResponseEntity<MentorDto> response = mentorRestController.getMentorById(id);
+        ResponseEntity<MentorDto> response = mentorRestController.getMentorById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(mentorDto1);
@@ -79,11 +79,9 @@ class MentorRestControllerTest {
 
     @Test
     void updateMentorById_shouldUpdateMentorWithGivenId() {
-        Long id = 1L;
-        MentorDto mentorDto = mentorDto2;
-        mentorDto.setId(id);
+        MentorDto mentorDto = mentorDto2; mentorDto.setId(VALID_ID);
         given(mentorService.updateMentorById(any(MentorDto.class), anyLong())).willReturn(mentorDto);
-        ResponseEntity<MentorDto> response = mentorRestController.updateMentorById(mentorDto2, id);
+        ResponseEntity<MentorDto> response = mentorRestController.updateMentorById(mentorDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(mentorDto);
@@ -91,9 +89,8 @@ class MentorRestControllerTest {
 
     @Test
     void deleteMentorById_shouldRemoveMentorWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = mentorRestController.deleteMentorById(id);
-        verify(mentorService).deleteMentorById(id);
+        ResponseEntity<Void> response = mentorRestController.deleteMentorById(VALID_ID);
+        verify(mentorService).deleteMentorById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

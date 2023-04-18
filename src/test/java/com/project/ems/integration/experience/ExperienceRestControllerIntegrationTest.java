@@ -2,7 +2,10 @@ package com.project.ems.integration.experience;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.ems.exception.ErrorResponse;
 import com.project.ems.experience.ExperienceDto;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
@@ -25,12 +28,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import static com.project.ems.constants.Constants.API_EXPERIENCES;
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
+import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.RESOURCE_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience2;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -74,7 +82,6 @@ class ExperienceRestControllerIntegrationTest {
         var resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource("data-test.sql"));
         resourceDatabasePopulator.execute(Objects.requireNonNull(jdbcTemplate.getDataSource()));
-
         transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
     }
 
@@ -85,7 +92,7 @@ class ExperienceRestControllerIntegrationTest {
 
     @Test
     void getAllExperiences_shouldReturnListOfExperiences() throws Exception {
-        ResponseEntity<String> response = template.getForEntity("/api/experiences", String.class);
+        ResponseEntity<String> response = template.getForEntity(API_EXPERIENCES, String.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -95,7 +102,7 @@ class ExperienceRestControllerIntegrationTest {
 
     @Test
     void getExperienceById_withValidId_shouldReturnExperienceWithGivenId() {
-        ResponseEntity<ExperienceDto> response = template.getForEntity("/api/experiences/1", ExperienceDto.class);
+        ResponseEntity<ExperienceDto> response = template.getForEntity(API_EXPERIENCES + "/" + VALID_ID, ExperienceDto.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -104,17 +111,19 @@ class ExperienceRestControllerIntegrationTest {
 
     @Test
     void getExperienceById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        ResponseEntity<String> response = template.getForEntity("/api/experiences/999", String.class);
+        ResponseEntity<ErrorResponse> response = template.getForEntity(API_EXPERIENCES + "/" + INVALID_ID, ErrorResponse.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).isEqualTo("Resource not found: " + String.format(EXPERIENCE_NOT_FOUND, id));
+        ErrorResponse result = Objects.requireNonNull(response.getBody());
+        assertThat(result.getStatusCode()).isEqualTo(NOT_FOUND.value());
+        assertThat(result.getMessage()).isEqualTo(String.format(RESOURCE_NOT_FOUND, String.format(EXPERIENCE_NOT_FOUND, INVALID_ID)));
+        assertThat(result.getTimestamp().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
     @Test
     void saveExperience_shouldAddExperienceToList() {
-        ResponseEntity<ExperienceDto> response = template.postForEntity("/api/experiences", experienceDto1, ExperienceDto.class);
+        ResponseEntity<ExperienceDto> response = template.postForEntity(API_EXPERIENCES, experienceDto1, ExperienceDto.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -123,12 +132,9 @@ class ExperienceRestControllerIntegrationTest {
 
     @Test
     void updateExperienceById_withValidId_shouldUpdateExperienceWithGivenId() {
-        Long id = 1L;
-        ExperienceDto ExperienceDto = experienceDto2;
-        ExperienceDto.setId(id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<ExperienceDto> response = template.exchange("/api/experiences/1", HttpMethod.PUT, new HttpEntity<>(experienceDto2, headers), ExperienceDto.class);
+        ExperienceDto ExperienceDto = experienceDto2; ExperienceDto.setId(VALID_ID);
+        HttpHeaders headers = new HttpHeaders(); headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ExperienceDto> response = template.exchange(API_EXPERIENCES + "/" + VALID_ID, HttpMethod.PUT, new HttpEntity<>(experienceDto2, headers), ExperienceDto.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -137,35 +143,38 @@ class ExperienceRestControllerIntegrationTest {
 
     @Test
     void updateExperienceById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<String> response = template.exchange("/api/experiences/999", HttpMethod.PUT, new HttpEntity<>(experienceDto2, headers), String.class);
+        HttpHeaders headers = new HttpHeaders(); headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorResponse> response = template.exchange(API_EXPERIENCES + "/" + INVALID_ID, HttpMethod.PUT, new HttpEntity<>(experienceDto2, headers), ErrorResponse.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).isEqualTo("Resource not found: " + String.format(EXPERIENCE_NOT_FOUND, id));
+        ErrorResponse result = Objects.requireNonNull(response.getBody());
+        assertThat(result.getStatusCode()).isEqualTo(NOT_FOUND.value());
+        assertThat(result.getMessage()).isEqualTo(String.format(RESOURCE_NOT_FOUND, String.format(EXPERIENCE_NOT_FOUND, INVALID_ID)));
+        assertThat(result.getTimestamp().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
     @Test
     void deleteExperienceById_withValidId_shouldRemoveExperienceWithGivenIdFromList() {
-        ResponseEntity<Void> response = template.exchange("/api/experiences/1", HttpMethod.DELETE, new HttpEntity<>(null), Void.class);
+        ResponseEntity<Void> response = template.exchange(API_EXPERIENCES + "/" + VALID_ID, HttpMethod.DELETE, new HttpEntity<>(null), Void.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        ResponseEntity<Void> getResponse = template.exchange("/api/experiences/1", HttpMethod.GET, null, Void.class);
+        ResponseEntity<Void> getResponse = template.exchange(API_EXPERIENCES + "/" + VALID_ID, HttpMethod.GET, null, Void.class);
         assertNotNull(getResponse);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        ResponseEntity<Void> getAllResponse = template.exchange("/api/experience", HttpMethod.GET, null, Void.class);
+        ResponseEntity<Void> getAllResponse = template.exchange(API_EXPERIENCES, HttpMethod.GET, null, Void.class);
         assertNotNull(getAllResponse);
     }
 
     @Test
     void deleteExperienceById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        ResponseEntity<String> response = template.exchange("/api/experiences/999", HttpMethod.DELETE, new HttpEntity<>(null), String.class);
+        ResponseEntity<ErrorResponse> response = template.exchange(API_EXPERIENCES + "/" + INVALID_ID, HttpMethod.DELETE, new HttpEntity<>(null), ErrorResponse.class);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).isEqualTo("Resource not found: " + String.format(EXPERIENCE_NOT_FOUND, id));
+        ErrorResponse result = Objects.requireNonNull(response.getBody());
+        assertThat(result.getStatusCode()).isEqualTo(NOT_FOUND.value());
+        assertThat(result.getMessage()).isEqualTo(String.format(RESOURCE_NOT_FOUND, String.format(EXPERIENCE_NOT_FOUND, INVALID_ID)));
+        assertThat(result.getTimestamp().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 }

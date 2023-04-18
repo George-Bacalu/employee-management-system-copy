@@ -19,7 +19,8 @@ public class MentorServiceImpl implements MentorService {
     @Override
     public List<MentorDto> getAllMentors() {
         List<Mentor> mentors = mentorRepository.findAll();
-        return modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {}.getType());
+        return modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {
+        }.getType());
     }
 
     @Override
@@ -43,10 +44,12 @@ public class MentorServiceImpl implements MentorService {
         mentor.setPassword(mentorDto.getPassword());
         mentor.setMobile(mentorDto.getMobile());
         mentor.setAddress(mentorDto.getAddress());
-        if(mentor.getBirthday() != null)
+        if (mentor.getBirthday() != null) {
             mentor.setBirthday(mentorDto.getBirthday());
-        if(mentor.getIsAvailable() != null)
+        }
+        if (mentor.getIsAvailable() != null) {
             mentor.setIsAvailable(mentorDto.getIsAvailable());
+        }
         mentor.setNumberOfEmployees(mentorDto.getNumberOfEmployees());
         Mentor updatedMentor = mentorRepository.save(mentor);
         return modelMapper.map(updatedMentor, MentorDto.class);

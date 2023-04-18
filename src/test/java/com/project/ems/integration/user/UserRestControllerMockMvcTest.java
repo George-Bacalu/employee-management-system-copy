@@ -19,7 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.project.ems.constants.Constants.API_USERS;
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
 import static com.project.ems.mock.UserMock.getMockedUsers;
@@ -67,7 +70,7 @@ class UserRestControllerMockMvcTest {
     @Test
     void getAllUsers_shouldReturnListOfUsers() throws Exception {
         given(userService.getAllUsers()).willReturn(userDtos);
-        ResultActions actions = mockMvc.perform(get("/api/users").accept(APPLICATION_JSON_VALUE))
+        ResultActions actions = mockMvc.perform(get(API_USERS).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk());
         for(UserDto userDto : userDtos) {
             actions.andExpect(jsonPath("$[?(@.id == " + userDto.getId().intValue() + ")]").exists());
@@ -84,29 +87,10 @@ class UserRestControllerMockMvcTest {
         assertThat(response).isEqualTo(userDtos);
     }
 
-//    @Test
-//    void getAllUsers_shouldReturnListOfUsers() throws Exception {
-//        given(userService.getAllUsers()).willReturn(userDtos);
-//        MvcResult result = mockMvc.perform(get("/api/users").accept(APPLICATION_JSON_VALUE))
-//              .andExpect(status().isOk())
-//              .andExpect(jsonPath("$[*].id").value(contains(userDto1.getId().intValue(), userDto2.getId().intValue())))
-//              .andExpect(jsonPath("$[*].name").value(contains(userDto1.getName(), userDto2.getName())))
-//              .andExpect(jsonPath("$[*].email").value(contains(userDto1.getEmail(), userDto2.getEmail())))
-//              .andExpect(jsonPath("$[*].password").value(contains(userDto1.getPassword(), userDto2.getPassword())))
-//              .andExpect(jsonPath("$[*].mobile").value(contains(userDto1.getMobile(), userDto2.getMobile())))
-//              .andExpect(jsonPath("$[*].address").value(contains(userDto1.getAddress(), userDto2.getAddress())))
-//              .andExpect(jsonPath("$[*].birthday").value(contains(userDto1.getBirthday().toString(), userDto2.getBirthday().toString())))
-//              .andExpect(jsonPath("$[*].roleId").value(contains(userDto1.getRoleId().intValue(), userDto2.getRoleId().intValue())))
-//              .andReturn();
-//        List<UserDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
-//        assertThat(response).isEqualTo(userDtos);
-//    }
-
     @Test
     void getUserById_withValidId_shouldReturnUserWithGivenId() throws Exception {
-        Long id = 1L;
         given(userService.getUserById(anyLong())).willReturn(userDto1);
-        MvcResult result = mockMvc.perform(get("/api/users/{id}", id).accept(APPLICATION_JSON_VALUE))
+        MvcResult result = mockMvc.perform(get(API_USERS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(userDto1.getId()))
               .andExpect(jsonPath("$.name").value(userDto1.getName()))
@@ -123,9 +107,8 @@ class UserRestControllerMockMvcTest {
 
     @Test
     void getUserById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(userService.getUserById(anyLong())).willThrow(new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
-        mockMvc.perform(get("/api/users/{id}", id).accept(APPLICATION_JSON_VALUE))
+        given(userService.getUserById(anyLong())).willThrow(new ResourceNotFoundException(String.format(USER_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(get(API_USERS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }
@@ -133,7 +116,7 @@ class UserRestControllerMockMvcTest {
     @Test
     void saveUser_shouldAddUserToList() throws Exception {
         given(userService.saveUser(any(UserDto.class))).willReturn(userDto1);
-        MvcResult result = mockMvc.perform(post("/api/users").accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(post(API_USERS).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(userDto1)))
               .andExpect(status().isCreated())
@@ -152,11 +135,9 @@ class UserRestControllerMockMvcTest {
 
     @Test
     void updateUserById_withValidId_shouldUpdateUserWithGivenId() throws Exception {
-        Long id = 1L;
-        UserDto userDto = userDto2;
-        userDto.setId(id);
+        UserDto userDto = userDto2; userDto.setId(VALID_ID);
         given(userService.updateUserById(any(UserDto.class), anyLong())).willReturn(userDto);
-        MvcResult result = mockMvc.perform(put("/api/users/{id}", id).accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(put(API_USERS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(userDto)))
               .andExpect(status().isOk())
@@ -175,9 +156,8 @@ class UserRestControllerMockMvcTest {
 
     @Test
     void updateUserById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(userService.updateUserById(any(UserDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
-        mockMvc.perform(put("/api/users/{id}", id).accept(APPLICATION_JSON_VALUE)
+        given(userService.updateUserById(any(UserDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(USER_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(put(API_USERS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(userDto2)))
               .andExpect(status().isNotFound())
@@ -186,18 +166,16 @@ class UserRestControllerMockMvcTest {
 
     @Test
     void deleteUserById_withValidId_shouldRemoveUserWithGivenIdFromList() throws Exception {
-        Long id = 1L;
-        mockMvc.perform(delete("/api/users/{id}", id).accept(APPLICATION_JSON_VALUE))
+        mockMvc.perform(delete(API_USERS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNoContent())
               .andReturn();
-        verify(userService).deleteUserById(id);
+        verify(userService).deleteUserById(VALID_ID);
     }
 
     @Test
     void deleteUserById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        doThrow(new ResourceNotFoundException(String.format(USER_NOT_FOUND, id))).when(userService).deleteUserById(id);
-        mockMvc.perform(delete("/api/users/{id}", id).accept(APPLICATION_JSON_VALUE))
+        doThrow(new ResourceNotFoundException(String.format(USER_NOT_FOUND, INVALID_ID))).when(userService).deleteUserById(anyLong());
+        mockMvc.perform(delete(API_USERS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }

@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience2;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
@@ -60,9 +61,8 @@ class ExperienceRestControllerTest {
 
     @Test
     void getExperienceById_shouldReturnExperienceWithGivenId() {
-        Long id = 1L;
         given(experienceService.getExperienceById(anyLong())).willReturn(experienceDto1);
-        ResponseEntity<ExperienceDto> response = experienceRestController.getExperienceById(id);
+        ResponseEntity<ExperienceDto> response = experienceRestController.getExperienceById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(experienceDto1);
@@ -79,11 +79,9 @@ class ExperienceRestControllerTest {
 
     @Test
     void updateExperienceById_shouldUpdateExperienceWithGivenId() {
-        Long id = 1L;
-        ExperienceDto experienceDto = experienceDto2;
-        experienceDto.setId(id);
+        ExperienceDto experienceDto = experienceDto2; experienceDto.setId(VALID_ID);
         given(experienceService.updateExperienceById(any(ExperienceDto.class), anyLong())).willReturn(experienceDto);
-        ResponseEntity<ExperienceDto> response = experienceRestController.updateExperienceById(experienceDto2, id);
+        ResponseEntity<ExperienceDto> response = experienceRestController.updateExperienceById(experienceDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(experienceDto);
@@ -91,9 +89,8 @@ class ExperienceRestControllerTest {
 
     @Test
     void deleteExperienceById_shouldRemoveExperienceWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = experienceRestController.deleteExperienceById(id);
-        verify(experienceService).deleteExperienceById(id);
+        ResponseEntity<Void> response = experienceRestController.deleteExperienceById(VALID_ID);
+        verify(experienceService).deleteExperienceById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

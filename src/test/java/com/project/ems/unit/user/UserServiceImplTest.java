@@ -21,7 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
@@ -55,7 +58,8 @@ class UserServiceImplTest {
     private User user1;
     private User user2;
     private List<User> users;
-    private Role role;
+    private Role role1;
+    private Role role2;
     private UserDto userDto1;
     private UserDto userDto2;
     private List<UserDto> userDtos;
@@ -65,7 +69,8 @@ class UserServiceImplTest {
         user1 = getMockedUser1();
         user2 = getMockedUser2();
         users = getMockedUsers();
-        role = getMockedRole2();
+        role1 = getMockedRole1();
+        role2 = getMockedRole2();
         userDto1 = modelMapper.map(user1, UserDto.class);
         userDto2 = modelMapper.map(user2, UserDto.class);
         userDtos = modelMapper.map(users, new TypeToken<List<UserDto>>() {}.getType());
@@ -80,18 +85,16 @@ class UserServiceImplTest {
 
     @Test
     void getUserById_withValidId_shouldReturnUserWithGivenId() {
-        Long id = 1L;
         given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user1));
-        UserDto result = userService.getUserById(id);
+        UserDto result = userService.getUserById(VALID_ID);
         assertThat(result).isEqualTo(userDto1);
     }
 
     @Test
     void getUserById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> userService.getUserById(id))
+        assertThatThrownBy(() -> userService.getUserById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(USER_NOT_FOUND, id));
+              .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -99,45 +102,44 @@ class UserServiceImplTest {
         given(userRepository.save(any(User.class))).willReturn(user1);
         UserDto result = userService.saveUser(userDto1);
         verify(userRepository).save(userCaptor.capture());
-        assertThat(result).isEqualTo(modelMapper.map(userCaptor.getValue(), UserDto.class));
+        User savedUser = userCaptor.getValue();
+        assertThat(result).isEqualTo(modelMapper.map(savedUser, UserDto.class));
+        assertThat(savedUser.getRole()).isEqualTo(role1);
     }
 
     @Test
     void updateUserById_withValidId_shouldUpdateUserWithGivenId() {
-        Long id = 1L;
-        User user = user2;
-        user.setId(id);
+        User user = user2; user.setId(VALID_ID);
         given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user1));
-        given(roleService.getRoleEntityById(anyLong())).willReturn(role);
-        given(userRepository.save(any(User.class))).willReturn(user1);
-        UserDto result = userService.updateUserById(userDto2, id);
+        given(roleService.getRoleEntityById(anyLong())).willReturn(role2);
+        given(userRepository.save(any(User.class))).willReturn(user);
+        UserDto result = userService.updateUserById(userDto2, VALID_ID);
         verify(userRepository).save(userCaptor.capture());
-        assertThat(result).isEqualTo(modelMapper.map(userCaptor.getValue(), UserDto.class));
+        User updatedUser = userCaptor.getValue();
+        assertThat(result).isEqualTo(modelMapper.map(updatedUser, UserDto.class));
+        assertThat(updatedUser.getRole()).isEqualTo(role2);
     }
 
     @Test
     void updateUserById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> userService.updateUserById(userDto2, id))
+        assertThatThrownBy(() -> userService.updateUserById(userDto2, INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(USER_NOT_FOUND, id));
+              .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void deleteUserById_withValidId_shouldRemoveUserWithGivenIdFromList() {
-        Long id = 1L;
         given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user1));
-        userService.deleteUserById(id);
+        userService.deleteUserById(VALID_ID);
         verify(userRepository).delete(user1);
     }
 
     @Test
     void deleteUserById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> userService.deleteUserById(id))
+        assertThatThrownBy(() -> userService.deleteUserById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(USER_NOT_FOUND, id));
+              .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
         verify(userRepository, never()).delete(any(User.class));
     }
 }

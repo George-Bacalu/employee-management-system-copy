@@ -18,7 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
 import static com.project.ems.mock.StudiesMock.getMockedStudies1;
 import static com.project.ems.mock.StudiesMock.getMockedStudies2;
@@ -71,18 +73,16 @@ class StudiesServiceIntegrationTest {
 
     @Test
     void getStudiesById_withValidId_shouldReturnStudiesWithGivenId() {
-        Long id = 1L;
         given(studiesRepository.findById(anyLong())).willReturn(Optional.ofNullable(studies1));
-        StudiesDto result = studiesService.getStudiesById(id);
+        StudiesDto result = studiesService.getStudiesById(VALID_ID);
         assertThat(result).isEqualTo(studiesDto1);
     }
 
     @Test
     void getStudiesById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> studiesService.getStudiesById(id))
+        assertThatThrownBy(() -> studiesService.getStudiesById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(STUDIES_NOT_FOUND, id));
+              .hasMessage(String.format(STUDIES_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -95,39 +95,34 @@ class StudiesServiceIntegrationTest {
 
     @Test
     void updateStudiesById_withValidId_shouldUpdateStudiesWithGivenId() {
-        Long id = 1L;
-        Studies studiesOb = studies2;
-        studiesOb.setId(id);
+        Studies studiesOb = studies2; studiesOb.setId(VALID_ID);
         given(studiesRepository.findById(anyLong())).willReturn(Optional.ofNullable(studies1));
-        given(studiesRepository.save(any(Studies.class))).willReturn(studies1);
-        StudiesDto result = studiesService.updateStudiesById(studiesDto2, id);
+        given(studiesRepository.save(any(Studies.class))).willReturn(studiesOb);
+        StudiesDto result = studiesService.updateStudiesById(studiesDto2, VALID_ID);
         verify(studiesRepository).save(studiesCaptor.capture());
         assertThat(result).isEqualTo(modelMapper.map(studiesCaptor.getValue(), StudiesDto.class));
     }
 
     @Test
     void updateStudiesById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> studiesService.updateStudiesById(studiesDto2, id))
+        assertThatThrownBy(() -> studiesService.updateStudiesById(studiesDto2, INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(STUDIES_NOT_FOUND, id));
+              .hasMessage(String.format(STUDIES_NOT_FOUND, INVALID_ID));
         verify(studiesRepository, never()).save(any(Studies.class));
     }
 
     @Test
     void deleteStudiesById_withValidId_shouldRemoveStudiesWithGivenIdFromList() {
-        Long id = 1L;
         given(studiesRepository.findById(anyLong())).willReturn(Optional.ofNullable(studies1));
-        studiesService.deleteStudiesById(id);
+        studiesService.deleteStudiesById(VALID_ID);
         verify(studiesRepository).delete(studies1);
     }
 
     @Test
     void deleteStudiesById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> studiesService.deleteStudiesById(id))
+        assertThatThrownBy(() -> studiesService.deleteStudiesById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(STUDIES_NOT_FOUND, id));
+              .hasMessage(String.format(STUDIES_NOT_FOUND, INVALID_ID));
         verify(studiesRepository, never()).delete(any(Studies.class));
     }
 }

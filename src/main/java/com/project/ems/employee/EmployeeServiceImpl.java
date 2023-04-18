@@ -51,8 +51,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPassword(employeeDto.getPassword());
         employee.setMobile(employeeDto.getMobile());
         employee.setAddress(employeeDto.getAddress());
-        if(employeeDto.getBirthday() != null)
+        if (employeeDto.getBirthday() != null) {
             employee.setBirthday(employeeDto.getBirthday());
+        }
         employee.setJobType(employeeDto.getJobType());
         employee.setPosition(employeeDto.getPosition());
         employee.setGrade(employeeDto.getGrade());
@@ -69,8 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.delete(employee);
     }
 
-    @Override
-    public Employee getEmployeeEntityById(Long id) {
+    private Employee getEmployeeEntityById(Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id)));
     }
 }

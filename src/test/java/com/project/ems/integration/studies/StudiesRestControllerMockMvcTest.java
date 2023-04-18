@@ -19,7 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.project.ems.constants.Constants.API_STUDIES;
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
 import static com.project.ems.mock.StudiesMock.getMockedStudies1;
 import static com.project.ems.mock.StudiesMock.getMockedStudies2;
@@ -66,7 +69,7 @@ class StudiesRestControllerMockMvcTest {
     @Test
     void getAllStudies_shouldReturnListOfStudies() throws Exception {
         given(studiesService.getAllStudies()).willReturn(studiesDtos);
-        ResultActions actions = mockMvc.perform(get("/api/studies").accept(APPLICATION_JSON_VALUE))
+        ResultActions actions = mockMvc.perform(get(API_STUDIES).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk());
         for(StudiesDto studiesDto : studiesDtos) {
             actions.andExpect(jsonPath("$[?(@.id == " + studiesDto.getId().intValue() + ")]").exists());
@@ -79,25 +82,10 @@ class StudiesRestControllerMockMvcTest {
         assertThat(response).isEqualTo(studiesDtos);
     }
 
-//    @Test
-//    void getAllStudies_shouldReturnListOfStudies() throws Exception {
-//        given(studiesService.getAllStudies()).willReturn(studiesDtos);
-//        MvcResult result = mockMvc.perform(get("/api/studies").accept(APPLICATION_JSON_VALUE))
-//              .andExpect(status().isOk())
-//              .andExpect(jsonPath("$[*].id").value(contains(studiesDto1.getId().intValue(), studiesDto2.getId().intValue())))
-//              .andExpect(jsonPath("$[*].university").value(contains(studiesDto1.getUniversity(), studiesDto2.getUniversity())))
-//              .andExpect(jsonPath("$[*].faculty").value(contains(studiesDto1.getFaculty(), studiesDto2.getFaculty())))
-//              .andExpect(jsonPath("$[*].major").value(contains(studiesDto1.getMajor(), studiesDto2.getMajor())))
-//              .andReturn();
-//        List<StudiesDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
-//        assertThat(response).isEqualTo(studiesDtos);
-//    }
-
     @Test
     void getStudiesById_withValidId_shouldReturnStudiesWithGivenId() throws Exception {
-        Long id = 1L;
         given(studiesService.getStudiesById(anyLong())).willReturn(studiesDto1);
-        MvcResult result = mockMvc.perform(get("/api/studies/{id}", id).accept(APPLICATION_JSON_VALUE))
+        MvcResult result = mockMvc.perform(get(API_STUDIES + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(studiesDto1.getId()))
               .andExpect(jsonPath("$.university").value(studiesDto1.getUniversity()))
@@ -110,9 +98,8 @@ class StudiesRestControllerMockMvcTest {
 
     @Test
     void getStudiesById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(studiesService.getStudiesById(anyLong())).willThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id)));
-        mockMvc.perform(get("/api/studies/{id}", id).accept(APPLICATION_JSON_VALUE))
+        given(studiesService.getStudiesById(anyLong())).willThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(get("/api/studies/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }
@@ -120,7 +107,7 @@ class StudiesRestControllerMockMvcTest {
     @Test
     void saveStudies_shouldAddStudiesToList() throws Exception {
         given(studiesService.saveStudies(any(StudiesDto.class))).willReturn(studiesDto1);
-        MvcResult result = mockMvc.perform(post("/api/studies").accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(post(API_STUDIES).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(studiesDto1)))
               .andExpect(status().isCreated())
@@ -135,11 +122,9 @@ class StudiesRestControllerMockMvcTest {
 
     @Test
     void updateStudiesById_withValidId_shouldUpdateStudiesWithGivenId() throws Exception {
-        Long id = 1L;
-        StudiesDto studiesDto = studiesDto2;
-        studiesDto.setId(id);
+        StudiesDto studiesDto = studiesDto2; studiesDto.setId(VALID_ID);
         given(studiesService.updateStudiesById(any(StudiesDto.class), anyLong())).willReturn(studiesDto);
-        MvcResult result = mockMvc.perform(put("/api/studies/{od}", id).accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(put(API_STUDIES + "/{od}", VALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(studiesDto)))
               .andExpect(status().isOk())
@@ -154,9 +139,8 @@ class StudiesRestControllerMockMvcTest {
 
     @Test
     void updateStudiesById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(studiesService.updateStudiesById(any(StudiesDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id)));
-        mockMvc.perform(put("/api/studies/{id}", id).accept(APPLICATION_JSON_VALUE)
+        given(studiesService.updateStudiesById(any(StudiesDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(put(API_STUDIES + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(studiesDto2)))
               .andExpect(status().isNotFound())
@@ -165,18 +149,16 @@ class StudiesRestControllerMockMvcTest {
 
     @Test
     void deleteStudiesById_withValidId_shouldRemoveStudiesWithGivenIdFromList() throws Exception {
-        Long id = 1L;
-        mockMvc.perform(delete("/api/studies/{id}", id).accept(APPLICATION_JSON_VALUE))
+        mockMvc.perform(delete(API_STUDIES + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNoContent())
               .andReturn();
-        verify(studiesService).deleteStudiesById(id);
+        verify(studiesService).deleteStudiesById(VALID_ID);
     }
 
     @Test
     void deleteStudiesById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        doThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id))).when(studiesService).deleteStudiesById(id);
-        mockMvc.perform(delete("/api/studies/{id}", id).accept(APPLICATION_JSON_VALUE))
+        doThrow(new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, INVALID_ID))).when(studiesService).deleteStudiesById(anyLong());
+        mockMvc.perform(delete(API_STUDIES + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }

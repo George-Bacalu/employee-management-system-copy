@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
@@ -60,9 +61,8 @@ class EmployeeRestControllerTest {
 
     @Test
     void getEmployeeById_shouldReturnEmployeeWithGivenId() {
-        Long id = 1L;
         given(employeeService.getEmployeeById(anyLong())).willReturn(employeeDto1);
-        ResponseEntity<EmployeeDto> response = employeeRestController.getEmployeeById(id);
+        ResponseEntity<EmployeeDto> response = employeeRestController.getEmployeeById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(employeeDto1);
@@ -79,11 +79,9 @@ class EmployeeRestControllerTest {
 
     @Test
     void updateEmployeeById_shouldUpdateEmployeeWithGivenId() {
-        Long id = 1L;
-        EmployeeDto employeeDto = employeeDto2;
-        employeeDto.setId(id);
+        EmployeeDto employeeDto = employeeDto2; employeeDto.setId(VALID_ID);
         given(employeeService.updateEmployeeById(any(EmployeeDto.class), anyLong())).willReturn(employeeDto);
-        ResponseEntity<EmployeeDto> response = employeeRestController.updateEmployeeById(employeeDto2, id);
+        ResponseEntity<EmployeeDto> response = employeeRestController.updateEmployeeById(employeeDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(employeeDto);
@@ -91,9 +89,8 @@ class EmployeeRestControllerTest {
 
     @Test
     void deleteEmployeeById_shouldRemoveEmployeeWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = employeeRestController.deleteEmployeeById(id);
-        verify(employeeService).deleteEmployeeById(id);
+        ResponseEntity<Void> response = employeeRestController.deleteEmployeeById(VALID_ID);
+        verify(employeeService).deleteEmployeeById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

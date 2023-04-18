@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
 import static com.project.ems.mock.UserMock.getMockedUsers;
@@ -60,9 +61,8 @@ class UserRestControllerTest {
 
     @Test
     void getUserById_shouldReturnUserWithGivenId() {
-        Long id = 1L;
         given(userService.getUserById(anyLong())).willReturn(userDto1);
-        ResponseEntity<UserDto> response = userRestController.getUserById(id);
+        ResponseEntity<UserDto> response = userRestController.getUserById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(userDto1);
@@ -79,11 +79,9 @@ class UserRestControllerTest {
 
     @Test
     void updateUserById_shouldUpdateUserWithGivenId() {
-        Long id = 1L;
-        UserDto userDto = userDto2;
-        userDto.setId(id);
+        UserDto userDto = userDto2; userDto.setId(VALID_ID);
         given(userService.updateUserById(any(UserDto.class), anyLong())).willReturn(userDto);
-        ResponseEntity<UserDto> response = userRestController.updateUserById(userDto2, id);
+        ResponseEntity<UserDto> response = userRestController.updateUserById(userDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(userDto);
@@ -91,9 +89,8 @@ class UserRestControllerTest {
 
     @Test
     void deleteUserById_shouldRemoveUserWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = userRestController.deleteUserById(id);
-        verify(userService).deleteUserById(id);
+        ResponseEntity<Void> response = userRestController.deleteUserById(VALID_ID);
+        verify(userService).deleteUserById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

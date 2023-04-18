@@ -18,7 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.ROLE_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
 import static com.project.ems.mock.RoleMock.getMockedRoles;
@@ -71,18 +73,16 @@ class RoleServiceIntegrationTest {
 
     @Test
     void getRoleById_withValidId_shouldReturnRolesWithGivenId() {
-        Long id = 1L;
         given(roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(role1));
-        RoleDto result = roleService.getRoleById(id);
+        RoleDto result = roleService.getRoleById(VALID_ID);
         assertThat(result).isEqualTo(roleDto1);
     }
 
     @Test
     void getRoleById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> roleService.getRoleById(id))
+        assertThatThrownBy(() -> roleService.getRoleById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(ROLE_NOT_FOUND, id));
+              .hasMessage(String.format(ROLE_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -95,39 +95,34 @@ class RoleServiceIntegrationTest {
 
     @Test
     void updateRoleById_withValidId_shouldUpdateRoleWithGivenId() {
-        Long id = 1L;
-        Role role = role2;
-        role.setId(id);
+        Role role = role2; role.setId(VALID_ID);
         given(roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(role1));
-        given(roleRepository.save(any(Role.class))).willReturn(role1);
-        RoleDto result = roleService.updateRoleById(roleDto2, id);
+        given(roleRepository.save(any(Role.class))).willReturn(role);
+        RoleDto result = roleService.updateRoleById(roleDto2, VALID_ID);
         verify(roleRepository).save(roleCaptor.capture());
         assertThat(result).isEqualTo(modelMapper.map(roleCaptor.getValue(), RoleDto.class));
     }
 
     @Test
     void updateRoleById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> roleService.updateRoleById(roleDto2, id))
+        assertThatThrownBy(() -> roleService.updateRoleById(roleDto2, INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(ROLE_NOT_FOUND, id));
+              .hasMessage(String.format(ROLE_NOT_FOUND, INVALID_ID));
         verify(roleRepository, never()).save(any(Role.class));
     }
 
     @Test
     void deleteRoleById_withValidId_shouldRemoveRoleWithGivenIdFromList() {
-        Long id = 1L;
         given(roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(role1));
-        roleService.deleteRoleById(id);
+        roleService.deleteRoleById(VALID_ID);
         verify(roleRepository).delete(role1);
     }
 
     @Test
     void deleteRoleById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> roleService.deleteRoleById(id))
+        assertThatThrownBy(() -> roleService.deleteRoleById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(ROLE_NOT_FOUND, id));
+              .hasMessage(String.format(ROLE_NOT_FOUND, INVALID_ID));
         verify(roleRepository, never()).delete(any(Role.class));
     }
 }

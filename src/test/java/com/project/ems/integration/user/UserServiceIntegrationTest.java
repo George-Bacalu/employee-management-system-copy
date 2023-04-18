@@ -20,7 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
@@ -79,18 +81,16 @@ class UserServiceIntegrationTest {
 
     @Test
     void getUserById_withValidId_shouldReturnUserWithGivenId() {
-        Long id = 1L;
         given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user1));
-        UserDto result = userService.getUserById(id);
+        UserDto result = userService.getUserById(VALID_ID);
         assertThat(result).isEqualTo(userDto1);
     }
 
     @Test
     void getUserById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> userService.getUserById(id))
+        assertThatThrownBy(() -> userService.getUserById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(USER_NOT_FOUND, id));
+              .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -103,40 +103,35 @@ class UserServiceIntegrationTest {
 
     @Test
     void updateUserById_withValidId_shouldUpdateUserWithGivenId() {
-        Long id = 1L;
-        User user = user2;
-        user.setId(id);
+        User user = user2; user.setId(VALID_ID);
         given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user1));
         given(roleService.getRoleEntityById(anyLong())).willReturn(role);
-        given(userRepository.save(any(User.class))).willReturn(user1);
-        UserDto result = userService.updateUserById(userDto2, id);
+        given(userRepository.save(any(User.class))).willReturn(user);
+        UserDto result = userService.updateUserById(userDto2, VALID_ID);
         verify(userRepository).save(userCaptor.capture());
         assertThat(result).isEqualTo(modelMapper.map(userCaptor.getValue(), UserDto.class));
     }
 
     @Test
     void updateUserById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> userService.updateUserById(userDto2, id))
+        assertThatThrownBy(() -> userService.updateUserById(userDto2, INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(USER_NOT_FOUND, id));
+              .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void deleteUserById_withValidId_shouldRemoveUserWithGivenIdFromList() {
-        Long id = 1L;
         given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user1));
-        userService.deleteUserById(id);
+        userService.deleteUserById(VALID_ID);
         verify(userRepository).delete(user1);
     }
 
     @Test
     void deleteUserById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> userService.deleteUserById(id))
+        assertThatThrownBy(() -> userService.deleteUserById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(USER_NOT_FOUND, id));
+              .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
         verify(userRepository, never()).delete(any(User.class));
     }
 }

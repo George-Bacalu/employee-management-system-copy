@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
 import static com.project.ems.mock.RoleMock.getMockedRoles;
@@ -60,9 +61,8 @@ class RoleRestControllerTest {
 
     @Test
     void getRoleById_shouldReturnRoleWithGivenId() {
-        Long id = 1L;
         given(roleService.getRoleById(anyLong())).willReturn(roleDto1);
-        ResponseEntity<RoleDto> response = roleRestController.getRoleById(id);
+        ResponseEntity<RoleDto> response = roleRestController.getRoleById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(roleDto1);
@@ -79,11 +79,9 @@ class RoleRestControllerTest {
 
     @Test
     void updateRoleById_shouldUpdateRoleWithGivenId() {
-        Long id = 1L;
-        RoleDto roleDto = roleDto2;
-        roleDto2.setId(id);
+        RoleDto roleDto = roleDto2; roleDto2.setId(VALID_ID);
         given(roleService.updateRoleById(any(RoleDto.class), anyLong())).willReturn(roleDto);
-        ResponseEntity<RoleDto> response = roleRestController.updateRoleById(roleDto2, id);
+        ResponseEntity<RoleDto> response = roleRestController.updateRoleById(roleDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(roleDto);
@@ -91,9 +89,8 @@ class RoleRestControllerTest {
 
     @Test
     void deleteRoleById_shouldRemoveRoleWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = roleRestController.deleteRoleById(id);
-        verify(roleService).deleteRoleById(id);
+        ResponseEntity<Void> response = roleRestController.deleteRoleById(VALID_ID);
+        verify(roleService).deleteRoleById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

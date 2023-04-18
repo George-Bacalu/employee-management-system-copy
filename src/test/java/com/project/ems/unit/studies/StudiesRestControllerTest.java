@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
 import static com.project.ems.mock.StudiesMock.getMockedStudies1;
 import static com.project.ems.mock.StudiesMock.getMockedStudies2;
@@ -60,9 +61,8 @@ class StudiesRestControllerTest {
 
     @Test
     void getStudiesById_shouldReturnStudiesWithGivenId() {
-        Long id = 1L;
         given(studiesService.getStudiesById(anyLong())).willReturn(studiesDto1);
-        ResponseEntity<StudiesDto> response = studiesRestController.getStudiesById(id);
+        ResponseEntity<StudiesDto> response = studiesRestController.getStudiesById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(studiesDto1);
@@ -79,11 +79,9 @@ class StudiesRestControllerTest {
 
     @Test
     void updateStudiesById_shouldUpdateStudiesWithGivenId() {
-        Long id = 1L;
-        StudiesDto studiesDto = studiesDto2;
-        studiesDto.setId(id);
+        StudiesDto studiesDto = studiesDto2; studiesDto.setId(VALID_ID);
         given(studiesService.updateStudiesById(any(StudiesDto.class), anyLong())).willReturn(studiesDto);
-        ResponseEntity<StudiesDto> response = studiesRestController.updateStudiesById(studiesDto2, id);
+        ResponseEntity<StudiesDto> response = studiesRestController.updateStudiesById(studiesDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(studiesDto);
@@ -91,9 +89,8 @@ class StudiesRestControllerTest {
 
     @Test
     void deleteStudiesById_shouldRemoveStudiesWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = studiesRestController.deleteStudiesById(id);
-        verify(studiesService).deleteStudiesById(id);
+        ResponseEntity<Void> response = studiesRestController.deleteStudiesById(VALID_ID);
+        verify(studiesService).deleteStudiesById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

@@ -19,7 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.MENTOR_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.MentorMock.getMockedMentor1;
 import static com.project.ems.mock.MentorMock.getMockedMentor2;
 import static com.project.ems.mock.MentorMock.getMockedMentors;
@@ -72,18 +74,16 @@ class MentorServiceImplTest {
 
     @Test
     void getMentorById_withValidId_shouldReturnMentorWithGivenId() {
-        Long id = 1L;
         given(mentorRepository.findById(anyLong())).willReturn(Optional.ofNullable(mentor1));
-        MentorDto result = mentorService.getMentorById(id);
+        MentorDto result = mentorService.getMentorById(VALID_ID);
         assertThat(result).isEqualTo(mentorDto1);
     }
 
     @Test
     void getMentorById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> mentorService.getMentorById(id))
+        assertThatThrownBy(() -> mentorService.getMentorById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(MENTOR_NOT_FOUND, id));
+              .hasMessage(String.format(MENTOR_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -96,39 +96,34 @@ class MentorServiceImplTest {
 
     @Test
     void updateMentorById_withValidId_shouldUpdateMentorWithGivenId() {
-        Long id = 1L;
-        Mentor mentor = mentor2;
-        mentor.setId(id);
+        Mentor mentor = mentor2; mentor.setId(VALID_ID);
         given(mentorRepository.findById(anyLong())).willReturn(Optional.ofNullable(mentor1));
         given(mentorRepository.save(any(Mentor.class))).willReturn(mentor);
-        MentorDto result = mentorService.updateMentorById(mentorDto2, id);
+        MentorDto result = mentorService.updateMentorById(mentorDto2, VALID_ID);
         verify(mentorRepository).save(mentorCaptor.capture());
         assertThat(result).isEqualTo(modelMapper.map(mentorCaptor.getValue(), MentorDto.class));
     }
 
     @Test
     void updateMentorById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> mentorService.updateMentorById(mentorDto2, id))
+        assertThatThrownBy(() -> mentorService.updateMentorById(mentorDto2, INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(MENTOR_NOT_FOUND, id));
+              .hasMessage(String.format(MENTOR_NOT_FOUND, INVALID_ID));
         verify(mentorRepository, never()).save(any(Mentor.class));
     }
 
     @Test
     void deleteMentorById_withValidId_shouldRemoveMentorWithGivenIdFromList() {
-        Long id = 1L;
         given(mentorRepository.findById(anyLong())).willReturn(Optional.ofNullable(mentor1));
-        mentorService.deleteMentorById(id);
+        mentorService.deleteMentorById(VALID_ID);
         verify(mentorRepository).delete(mentor1);
     }
 
     @Test
     void deleteMentorById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> mentorService.deleteMentorById(id))
+        assertThatThrownBy(() -> mentorService.deleteMentorById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(MENTOR_NOT_FOUND, id));
+              .hasMessage(String.format(MENTOR_NOT_FOUND, INVALID_ID));
         verify(mentorRepository, never()).delete(any(Mentor.class));
     }
 }

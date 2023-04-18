@@ -19,7 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.project.ems.constants.Constants.API_MENTORS;
+import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.MENTOR_NOT_FOUND;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.MentorMock.getMockedMentor1;
 import static com.project.ems.mock.MentorMock.getMockedMentor2;
 import static com.project.ems.mock.MentorMock.getMockedMentors;
@@ -67,7 +70,7 @@ class MentorRestControllerMockMvcTest {
     @Test
     void getAllMentors_shouldReturnListOfMentors() throws Exception {
         given(mentorService.getAllMentors()).willReturn(mentorDtos);
-        ResultActions actions = mockMvc.perform(get("/api/mentors").accept(APPLICATION_JSON_VALUE))
+        ResultActions actions = mockMvc.perform(get(API_MENTORS).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk());
         for(MentorDto mentorDto : mentorDtos) {
             actions.andExpect(jsonPath("$[?(@.id == " + mentorDto.getId().intValue() + ")]").exists());
@@ -85,30 +88,10 @@ class MentorRestControllerMockMvcTest {
         assertThat(response).isEqualTo(mentorDtos);
     }
 
-//    @Test
-//    void getAllMentors_shouldReturnListOfMentors() throws Exception {
-//        given(mentorService.getAllMentors()).willReturn(mentorDtos);
-//        MvcResult result = mockMvc.perform(get("/api/mentors").accept(APPLICATION_JSON_VALUE))
-//              .andExpect(status().isOk())
-//              .andExpect(jsonPath("$[*].id").value(contains(mentorDto1.getId().intValue(), mentorDto2.getId().intValue())))
-//              .andExpect(jsonPath("$[*].name").value(contains(mentorDto1.getName(), mentorDto2.getName())))
-//              .andExpect(jsonPath("$[*].email").value(contains(mentorDto1.getEmail(), mentorDto2.getEmail())))
-//              .andExpect(jsonPath("$[*].password").value(contains(mentorDto1.getPassword(), mentorDto2.getPassword())))
-//              .andExpect(jsonPath("$[*].mobile").value(contains(mentorDto1.getMobile(), mentorDto2.getMobile())))
-//              .andExpect(jsonPath("$[*].address").value(contains(mentorDto1.getAddress(), mentorDto2.getAddress())))
-//              .andExpect(jsonPath("$[*].birthday").value(contains(mentorDto1.getBirthday().toString(), mentorDto2.getBirthday().toString())))
-//              .andExpect(jsonPath("$[*].isAvailable").value(contains(mentorDto1.getIsAvailable(), mentorDto2.getIsAvailable())))
-//              .andExpect(jsonPath("$[*].numberOfEmployees").value(contains(mentorDto1.getNumberOfEmployees(), mentorDto2.getNumberOfEmployees())))
-//              .andReturn();
-//        List<MentorDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
-//        assertThat(response).isEqualTo(mentorDtos);
-//    }
-
     @Test
     void getMentorById_withValidId_shouldReturnMentorWithGivenId() throws Exception {
-        Long id = 1L;
         given(mentorService.getMentorById(anyLong())).willReturn(mentorDto1);
-        MvcResult result = mockMvc.perform(get("/api/mentors/{id}", id).accept(APPLICATION_JSON_VALUE))
+        MvcResult result = mockMvc.perform(get(API_MENTORS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(mentorDto1.getId()))
               .andExpect(jsonPath("$.name").value(mentorDto1.getName()))
@@ -126,9 +109,8 @@ class MentorRestControllerMockMvcTest {
 
     @Test
     void getMentorById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(mentorService.getMentorById(anyLong())).willThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id)));
-        mockMvc.perform(get("/api/mentors/{id}", id).accept(APPLICATION_JSON_VALUE))
+        given(mentorService.getMentorById(anyLong())).willThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(get(API_MENTORS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }
@@ -136,7 +118,7 @@ class MentorRestControllerMockMvcTest {
     @Test
     void saveMentor_shouldAddMentorToList() throws Exception {
         given(mentorService.saveMentor(any(MentorDto.class))).willReturn(mentorDto1);
-        MvcResult result = mockMvc.perform(post("/api/mentors").accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(post(API_MENTORS).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(mentorDto1)))
               .andExpect(status().isCreated())
@@ -156,11 +138,9 @@ class MentorRestControllerMockMvcTest {
 
     @Test
     void updateMentorById_withValidId_shouldUpdateMentorWithGivenId() throws Exception {
-        Long id = 1L;
-        MentorDto mentorDto = mentorDto2;
-        mentorDto.setId(id);
+        MentorDto mentorDto = mentorDto2; mentorDto.setId(VALID_ID);
         given(mentorService.updateMentorById(any(MentorDto.class), anyLong())).willReturn(mentorDto);
-        MvcResult result = mockMvc.perform(put("/api//mentors/{id}", id).accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(put(API_MENTORS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(mentorDto)))
               .andExpect(status().isOk())
@@ -180,9 +160,8 @@ class MentorRestControllerMockMvcTest {
 
     @Test
     void updateMentorById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(mentorService.updateMentorById(any(MentorDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id)));
-        mockMvc.perform(put("/api/mentors/{id}", id).accept(APPLICATION_JSON_VALUE)
+        given(mentorService.updateMentorById(any(MentorDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(put(API_MENTORS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(mentorDto2)))
               .andExpect(status().isNotFound())
@@ -191,18 +170,16 @@ class MentorRestControllerMockMvcTest {
 
     @Test
     void deleteMentorById_withValidId_shouldRemoveMentorWithGivenIdFromList() throws Exception {
-        Long id = 1L;
-        mockMvc.perform(delete("/api/mentors/{id}", id).accept(APPLICATION_JSON_VALUE))
+        mockMvc.perform(delete(API_MENTORS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNoContent())
               .andReturn();
-        verify(mentorService).deleteMentorById(id);
+        verify(mentorService).deleteMentorById(VALID_ID);
     }
 
     @Test
     void deleteMentorById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        doThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id))).when(mentorService).deleteMentorById(id);
-        mockMvc.perform(delete("/api/mentors/{id}", id).accept(APPLICATION_JSON_VALUE))
+        doThrow(new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, INVALID_ID))).when(mentorService).deleteMentorById(anyLong());
+        mockMvc.perform(delete(API_MENTORS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }

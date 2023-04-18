@@ -19,6 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
+import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience2;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
@@ -71,18 +73,16 @@ class ExperienceServiceIntegrationTest {
 
     @Test
     void getExperienceById_withValidId_shouldReturnExperienceWithGivenId() {
-        Long id = 1L;
         given(experienceRepository.findById(anyLong())).willReturn(Optional.ofNullable(experience1));
-        ExperienceDto result = experienceService.getExperienceById(id);
+        ExperienceDto result = experienceService.getExperienceById(VALID_ID);
         assertThat(result).isEqualTo(experienceDto1);
     }
 
     @Test
     void getExperienceById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> experienceService.getExperienceById(id))
+        assertThatThrownBy(() -> experienceService.getExperienceById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(EXPERIENCE_NOT_FOUND, id));
+              .hasMessage(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -95,39 +95,34 @@ class ExperienceServiceIntegrationTest {
 
     @Test
     void updateExperienceById_withValidId_shouldUpdateExperienceWithGivenId() {
-        Long id = 1L;
-        Experience experience = experience2;
-        experience.setId(id);
+        Experience experience = experience2; experience.setId(VALID_ID);
         given(experienceRepository.findById(anyLong())).willReturn(Optional.ofNullable(experience1));
         given(experienceRepository.save(any(Experience.class))).willReturn(experience);
-        ExperienceDto result = experienceService.updateExperienceById(experienceDto2, id);
+        ExperienceDto result = experienceService.updateExperienceById(experienceDto2, VALID_ID);
         verify(experienceRepository).save(experienceCaptor.capture());
         assertThat(result).isEqualTo(modelMapper.map(experienceCaptor.getValue(), ExperienceDto.class));
     }
 
     @Test
     void updateExperienceById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> experienceService.updateExperienceById(experienceDto2, id))
+        assertThatThrownBy(() -> experienceService.updateExperienceById(experienceDto2, INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(EXPERIENCE_NOT_FOUND, id));
+              .hasMessage(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID));
         verify(experienceRepository, never()).save(any(Experience.class));
     }
 
     @Test
     void deleteExperienceById_withValidId_shouldRemoveExperienceWithGivenIdFromList() {
-        Long id = 1L;
         given(experienceRepository.findById(anyLong())).willReturn(Optional.ofNullable(experience1));
-        experienceService.deleteExperienceById(id);
+        experienceService.deleteExperienceById(VALID_ID);
         verify(experienceRepository).delete(experience1);
     }
 
     @Test
     void deleteExperienceById_withInvalidId_shouldThrowException() {
-        Long id = 999L;
-        assertThatThrownBy(() -> experienceService.deleteExperienceById(id))
+        assertThatThrownBy(() -> experienceService.deleteExperienceById(INVALID_ID))
               .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(EXPERIENCE_NOT_FOUND, id));
+              .hasMessage(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID));
         verify(experienceRepository, never()).delete(any(Experience.class));
     }
 }

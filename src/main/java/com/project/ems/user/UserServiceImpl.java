@@ -45,8 +45,9 @@ public class UserServiceImpl implements UserService {
         user.setPassword(userDto.getPassword());
         user.setMobile(userDto.getMobile());
         user.setAddress(userDto.getAddress());
-        if(user.getBirthday() != null)
+        if (user.getBirthday() != null) {
             user.setBirthday(userDto.getBirthday());
+        }
         user.setRole(roleService.getRoleEntityById(userDto.getRoleId()));
         User updatedUser = userRepository.save(user);
         return modelMapper.map(updatedUser, UserDto.class);

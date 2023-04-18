@@ -19,7 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.project.ems.constants.Constants.API_FEEDBACKS;
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
+import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback2;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
@@ -66,7 +69,7 @@ class FeedbackRestControllerMockMvcTest {
     @Test
     void getAllFeedbacks_shouldReturnListOfFeedbacks() throws Exception {
         given(feedbackService.getAllFeedbacks()).willReturn(feedbackDtos);
-        ResultActions actions = mockMvc.perform(get("/api/feedbacks").accept(APPLICATION_JSON_VALUE))
+        ResultActions actions = mockMvc.perform(get(API_FEEDBACKS).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk());
         for(FeedbackDto feedbackDto : feedbackDtos) {
             actions.andExpect(jsonPath("$[?(@.id == " + feedbackDto.getId().intValue() + ")]").exists());
@@ -80,31 +83,15 @@ class FeedbackRestControllerMockMvcTest {
         assertThat(response).isEqualTo(feedbackDtos);
     }
 
-//    @Test
-//    void getAllFeedbacks_shouldReturnListOfFeedbacks() throws Exception {
-//        given(feedbackService.getAllFeedbacks()).willReturn(feedbackDtos);
-//        MvcResult result = mockMvc.perform(get("/api/feedbacks").accept(APPLICATION_JSON_VALUE))
-//              .andExpect(status().isOk())
-//              .andExpect(jsonPath("$[*].id").value(contains(feedbackDto1.getId().intValue(), feedbackDto2.getId().intValue())))
-//              .andExpect(jsonPath("$[*].feedbackType").value(contains(feedbackDto1.getFeedbackType().toString(), feedbackDto2.getFeedbackType().toString())))
-//              .andExpect(jsonPath("$[*].description").value(contains(feedbackDto1.getDescription(), feedbackDto2.getDescription())))
-//              .andExpect(jsonPath("$[*].sentAt").value(contains(feedbackDto1.getSentAt().toString() + ":00", feedbackDto2.getSentAt().toString() + ":00")))
-//              .andExpect(jsonPath("$[*].userId").value(contains(feedbackDto1.getUserId().intValue(), feedbackDto2.getUserId().intValue())))
-//              .andReturn();
-//        List<FeedbackDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
-//        assertThat(response).isEqualTo(feedbackDtos);
-//    }
-
     @Test
     void getFeedbackById_withValidId_shouldReturnFeedbackWithGivenId() throws Exception {
-        Long id = 1L;
         given(feedbackService.getFeedbackById(anyLong())).willReturn(feedbackDto1);
-        MvcResult result = mockMvc.perform(get("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE))
+        MvcResult result = mockMvc.perform(get(API_FEEDBACKS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$.feedbackType").value(feedbackDto1.getFeedbackType().toString()))
               .andExpect(jsonPath("$.description").value(feedbackDto1.getDescription()))
-              .andExpect(jsonPath("$.sentAt").value(feedbackDto1.getSentAt().toString() + ":00"))
+              .andExpect(jsonPath("$.sentAt").value(feedbackDto1.getSentAt() + ":00"))
               .andExpect(jsonPath("$.userId").value(feedbackDto1.getUserId()))
               .andReturn();
         FeedbackDto response = objectMapper.readValue(result.getResponse().getContentAsString(), FeedbackDto.class);
@@ -113,9 +100,8 @@ class FeedbackRestControllerMockMvcTest {
 
     @Test
     void getFeedbackById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(feedbackService.getFeedbackById(anyLong())).willThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id)));
-        mockMvc.perform(get("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE))
+        given(feedbackService.getFeedbackById(anyLong())).willThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(get(API_FEEDBACKS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }
@@ -123,14 +109,14 @@ class FeedbackRestControllerMockMvcTest {
     @Test
     void saveFeedback_shouldAddFeedbackToList() throws Exception {
         given(feedbackService.saveFeedback(any(FeedbackDto.class))).willReturn(feedbackDto1);
-        MvcResult result = mockMvc.perform(post("/api/feedbacks").accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(post(API_FEEDBACKS).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(feedbackDto1)))
               .andExpect(status().isCreated())
               .andExpect(jsonPath("$.id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$.feedbackType").value(feedbackDto1.getFeedbackType().toString()))
               .andExpect(jsonPath("$.description").value(feedbackDto1.getDescription()))
-              .andExpect(jsonPath("$.sentAt").value(feedbackDto1.getSentAt().toString() + ":00"))
+              .andExpect(jsonPath("$.sentAt").value(feedbackDto1.getSentAt() + ":00"))
               .andExpect(jsonPath("$.userId").value(feedbackDto1.getUserId()))
               .andReturn();
         FeedbackDto response = objectMapper.readValue(result.getResponse().getContentAsString(), FeedbackDto.class);
@@ -139,18 +125,16 @@ class FeedbackRestControllerMockMvcTest {
 
     @Test
     void updateFeedbackById_withValidId_shouldUpdateFeedbackWithGivenId() throws Exception {
-        Long id = 1L;
-        FeedbackDto feedbackDto = feedbackDto2;
-        feedbackDto.setId(id);
+        FeedbackDto feedbackDto = feedbackDto2; feedbackDto.setId(VALID_ID);
         given(feedbackService.updateFeedbackById(any(FeedbackDto.class), anyLong())).willReturn(feedbackDto);
-        MvcResult result = mockMvc.perform(put("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE)
+        MvcResult result = mockMvc.perform(put(API_FEEDBACKS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(feedbackDto)))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id").value(feedbackDto1.getId()))
               .andExpect(jsonPath("$.feedbackType").value(feedbackDto2.getFeedbackType().toString()))
               .andExpect(jsonPath("$.description").value(feedbackDto2.getDescription()))
-              .andExpect(jsonPath("$.sentAt").value(feedbackDto2.getSentAt().toString() + ":00"))
+              .andExpect(jsonPath("$.sentAt").value(feedbackDto2.getSentAt() + ":00"))
               .andExpect(jsonPath("$.userId").value(feedbackDto2.getUserId()))
               .andReturn();
         FeedbackDto response = objectMapper.readValue(result.getResponse().getContentAsString(), FeedbackDto.class);
@@ -159,9 +143,8 @@ class FeedbackRestControllerMockMvcTest {
 
     @Test
     void updateFeedbackById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        given(feedbackService.updateFeedbackById(any(FeedbackDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id)));
-        mockMvc.perform(put("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE)
+        given(feedbackService.updateFeedbackById(any(FeedbackDto.class), anyLong())).willThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, INVALID_ID)));
+        mockMvc.perform(put(API_FEEDBACKS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(feedbackDto2)))
               .andExpect(status().isNotFound())
@@ -170,18 +153,16 @@ class FeedbackRestControllerMockMvcTest {
 
     @Test
     void deleteFeedbackById_withValidId_shouldRemoveFeedbackWithGivenIdFromList() throws Exception {
-        Long id = 1L;
-        mockMvc.perform(delete("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE))
+        mockMvc.perform(delete(API_FEEDBACKS + "/{id}", VALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNoContent())
               .andReturn();
-        verify(feedbackService).deleteFeedbackById(id);
+        verify(feedbackService).deleteFeedbackById(VALID_ID);
     }
 
     @Test
     void deleteFeedbackById_withInvalidId_shouldThrowException() throws Exception {
-        Long id = 999L;
-        doThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id))).when(feedbackService).deleteFeedbackById(id);
-        mockMvc.perform(delete("/api/feedbacks/{id}", id).accept(APPLICATION_JSON_VALUE))
+        doThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, INVALID_ID))).when(feedbackService).deleteFeedbackById(anyLong());
+        mockMvc.perform(delete(API_FEEDBACKS + "/{id}", INVALID_ID).accept(APPLICATION_JSON_VALUE))
               .andExpect(status().isNotFound())
               .andReturn();
     }

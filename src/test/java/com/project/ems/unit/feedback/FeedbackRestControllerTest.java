@@ -16,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback2;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
@@ -60,9 +61,8 @@ class FeedbackRestControllerTest {
 
     @Test
     void getFeedbackById_shouldReturnFeedbackWithGivenId() {
-        Long id = 1L;
         given(feedbackService.getFeedbackById(anyLong())).willReturn(feedbackDto1);
-        ResponseEntity<FeedbackDto> response = feedbackRestController.getFeedbackById(id);
+        ResponseEntity<FeedbackDto> response = feedbackRestController.getFeedbackById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(feedbackDto1);
@@ -79,11 +79,9 @@ class FeedbackRestControllerTest {
 
     @Test
     void updateFeedbackById_shouldUpdateFeedbackWithGivenId() {
-        Long id = 1L;
-        FeedbackDto feedbackDto = feedbackDto2;
-        feedbackDto.setId(id);
+        FeedbackDto feedbackDto = feedbackDto2; feedbackDto.setId(VALID_ID);
         given(feedbackService.updateFeedbackById(any(FeedbackDto.class), anyLong())).willReturn(feedbackDto);
-        ResponseEntity<FeedbackDto> response = feedbackRestController.updateFeedbackById(feedbackDto2, id);
+        ResponseEntity<FeedbackDto> response = feedbackRestController.updateFeedbackById(feedbackDto2, VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(feedbackDto);
@@ -91,9 +89,8 @@ class FeedbackRestControllerTest {
 
     @Test
     void deleteFeedbackById_shouldRemoveFeedbackWithGivenIdFromList() {
-        Long id = 1L;
-        ResponseEntity<Void> response = feedbackRestController.deleteFeedbackById(id);
-        verify(feedbackService).deleteFeedbackById(id);
+        ResponseEntity<Void> response = feedbackRestController.deleteFeedbackById(VALID_ID);
+        verify(feedbackService).deleteFeedbackById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

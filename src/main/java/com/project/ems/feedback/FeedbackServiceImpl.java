@@ -57,8 +57,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         feedbackRepository.delete(feedback);
     }
 
-    @Override
-    public Feedback getFeedbackEntityById(Long id) {
+    private Feedback getFeedbackEntityById(Long id) {
         return feedbackRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id)));
     }
 }
