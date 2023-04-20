@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Studies</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+</head>
+<body>
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a th:href="@{/employees}" class="navbar-brand p-2">Employee Management System</a>
+  </nav>
+</header>
+<main style="width: 93%" class="my-2 mx-auto text-left">
+  <h1>Studies List</h1>
+  <a th:href="@{/studies/save-studies}" class="btn btn-primary my-1">Save Studies</a>
+  <table class="table table-striped table-bordered">
+    <thead class="thead-dark">
+    <tr>
+      <th>University</th>
+      <th>Faculty</th>
+      <th>Major</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="studiesOb: ${studies}">
+      <td th:text="${studiesOb.university}"></td>
+      <td th:text="${studiesOb.faculty}"></td>
+      <td th:text="${studiesOb.major}"></td>
+      <td>
+        <a th:href="@{/studies/update-studies/{id}(id=${studiesOb.id})}" class="btn btn-secondary">Update</a>
+        <a th:href="@{/studies/delete-studies/{id}(id=${studiesOb.id})}" class="btn btn-danger">Delete</a>
+        <a th:href="@{/studies/{id}(id=${studiesOb.id})}" class="btn btn-info">View details</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+<footer class="text-center text-lg-start bg-dark position-absolute fixed-bottom">
+  <div class="text-white p-3">© Copyright <span th:text="${#dates.year(#dates.createNow())}"></span> - George Bacalu</div>
+</footer>
+</body>
+</html>

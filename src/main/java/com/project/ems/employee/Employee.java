@@ -5,7 +5,6 @@ import com.project.ems.employee.enums.JobType;
 import com.project.ems.employee.enums.Position;
 import com.project.ems.experience.Experience;
 import com.project.ems.mentor.Mentor;
-import com.project.ems.person.Person;
 import com.project.ems.studies.Studies;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,29 +17,44 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@Builder
 @Entity
 @Table(name = "employees")
-public class Employee extends Person {
+public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String name;
+
+    private String email;
+
+    private String password;
+
+    private String mobile;
+
+    private String address;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
 
     @Enumerated(EnumType.STRING)
     private JobType jobType;

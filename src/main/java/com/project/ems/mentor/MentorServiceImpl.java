@@ -19,8 +19,7 @@ public class MentorServiceImpl implements MentorService {
     @Override
     public List<MentorDto> getAllMentors() {
         List<Mentor> mentors = mentorRepository.findAll();
-        return modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {
-        }.getType());
+        return modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {}.getType());
     }
 
     @Override

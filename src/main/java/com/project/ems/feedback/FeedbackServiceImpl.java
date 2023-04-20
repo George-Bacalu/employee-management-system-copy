@@ -35,7 +35,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public FeedbackDto saveFeedback(FeedbackDto feedbackDto) {
-        Feedback feedback = modelMapper.map(feedbackDto, Feedback.class);
+        Feedback feedback = convertToEntity(feedbackDto);
         feedback.setSentAt(LocalDateTime.now(clock));
         Feedback savedFeedback = feedbackRepository.save(feedback);
         return modelMapper.map(savedFeedback, FeedbackDto.class);
@@ -59,5 +59,11 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     private Feedback getFeedbackEntityById(Long id) {
         return feedbackRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, id)));
+    }
+
+    private Feedback convertToEntity(FeedbackDto feedbackDto) {
+        Feedback feedback = modelMapper.map(feedbackDto, Feedback.class);
+        feedback.setUser(userService.getUserEntityById(feedbackDto.getUserId()));
+        return feedback;
     }
 }

@@ -81,6 +81,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private Employee convertToEntity(EmployeeDto employeeDto) {
         Employee employee = modelMapper.map(employeeDto, Employee.class);
+        employee.setMentor(mentorService.getMentorEntityById(employeeDto.getMentorId()));
+        employee.setStudies(studiesService.getStudiesEntityById(employeeDto.getStudiesId()));
         employee.setExperiences(employeeDto.getExperiencesIds().stream().map(experienceService::getExperienceEntityById).toList());
         return employee;
     }
