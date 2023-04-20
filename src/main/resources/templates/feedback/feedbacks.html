@@ -15,7 +15,7 @@
 </header>
 <main style="width: 93%" class="my-2 mx-auto text-left">
   <h1>Feedbacks List</h1>
-  <a th:href="@{/feedbacks/save-feedback}" class="btn btn-primary my-1">Save Feedback</a>
+  <a th:href="@{/feedbacks/save-feedback/-1}" class="btn btn-primary my-1">Save Feedback</a>
   <table class="table table-striped table-bordered">
     <thead class="thead-dark">
     <tr>
@@ -31,7 +31,7 @@
       <td th:text="${feedback.description}"></td>
       <td th:text="${feedback.user.name}"></td>
       <td>
-        <a th:href="@{/feedbacks/update-feedback/{id}(id=${feedback.id})}" class="btn btn-secondary">Update</a>
+        <a th:href="@{/feedbacks/save-feedback/{id}(id=${feedback.id})}" class="btn btn-secondary">Update</a>
         <a th:href="@{/feedbacks/delete-feedback/{id}(id=${feedback.id})}" class="btn btn-danger">Delete</a>
         <a th:href="@{/feedbacks/{id}(id=${feedback.id})}" class="btn btn-info">View details</a>
       </td>

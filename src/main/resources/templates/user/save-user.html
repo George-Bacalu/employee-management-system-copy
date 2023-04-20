@@ -15,9 +15,10 @@
 </header>
 <main class="container my-2">
   <div class="card px-4">
-    <h1 class="text-center">Save User</h1>
+    <h1 th:if="${id == -1}" class="text-center">Save User</h1>
+    <h1 th:unless="${id == -1}" class="text-center">Update User</h1>
     <div class="card-body">
-      <form th:action="@{/users/save-user}" method="post" th:object="${userDto}">
+      <form th:action="@{/users/save-user/{id}(id=${id})}" method="post" th:object="${userDto}">
         <div class="row">
           <div class="col-md-6 form-group">
             <label for="name">Name <span class="text-danger font-weight-bold">*</span></label>
@@ -36,7 +37,8 @@
             <input type="text" id="role-id" th:field="*{roleId}" placeholder="Enter role ID" class="form-control" required>
           </div>
         </div>
-        <button type="submit" class="btn btn-success" style="width: 15%">Save</button>
+        <button th:if="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Save</button>
+        <button th:unless="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Update</button>
         <a th:href="@{/users}" type="button" class="btn btn-danger ml-2" style="width: 15%">Cancel</a>
       </form>
     </div>

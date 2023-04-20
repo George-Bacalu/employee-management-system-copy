@@ -15,7 +15,7 @@
 </header>
 <main style="width: 93%" class="my-2 mx-auto text-left">
   <h1>Studies List</h1>
-  <a th:href="@{/studies/save-studies}" class="btn btn-primary my-1">Save Studies</a>
+  <a th:href="@{/studies/save-studies/-1}" class="btn btn-primary my-1">Save Studies</a>
   <table class="table table-striped table-bordered">
     <thead class="thead-dark">
     <tr>
@@ -31,7 +31,7 @@
       <td th:text="${studiesOb.faculty}"></td>
       <td th:text="${studiesOb.major}"></td>
       <td>
-        <a th:href="@{/studies/update-studies/{id}(id=${studiesOb.id})}" class="btn btn-secondary">Update</a>
+        <a th:href="@{/studies/save-studies/{id}(id=${studiesOb.id})}" class="btn btn-secondary">Update</a>
         <a th:href="@{/studies/delete-studies/{id}(id=${studiesOb.id})}" class="btn btn-danger">Delete</a>
         <a th:href="@{/studies/{id}(id=${studiesOb.id})}" class="btn btn-info">View details</a>
       </td>

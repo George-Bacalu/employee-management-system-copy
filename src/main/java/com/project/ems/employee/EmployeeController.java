@@ -36,27 +36,20 @@ public class EmployeeController {
         return "employee/employee-details";
     }
 
-    @GetMapping("/save-employee")
-    public String getSaveEmployeePage(Model model) {
-        model.addAttribute("employeeDto", new EmployeeDto());
+    @GetMapping("/save-employee/{id}")
+    public String getSaveEmployeePage(Model model, @PathVariable Long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("employeeDto", id == -1 ? new EmployeeDto() : employeeService.getEmployeeById(id));
         return "employee/save-employee";
     }
 
-    @PostMapping("/save-employee")
-    public String saveEmployee(@ModelAttribute EmployeeDto employeeDto) {
-        employeeService.saveEmployee(employeeDto);
-        return "redirect:/employees";
-    }
-
-    @GetMapping("/update-employee/{id}")
-    public String getUpdateEmployeePage(Model model, @PathVariable Long id) {
-        model.addAttribute("employeeDto", employeeService.getEmployeeById(id));
-        return "employee/update-employee";
-    }
-
-    @PostMapping("/update-employee/{id}")
-    public String updateEmployeeById(@ModelAttribute EmployeeDto employeeDto, @PathVariable Long id) {
-        employeeService.updateEmployeeById(employeeDto, id);
+    @PostMapping("/save-employee/{id}")
+    public String saveEmployee(@ModelAttribute EmployeeDto employeeDto, @PathVariable Long id) {
+        if (id == -1) {
+            employeeService.saveEmployee(employeeDto);
+        } else {
+            employeeService.updateEmployeeById(employeeDto, id);
+        }
         return "redirect:/employees";
     }
 

@@ -19,7 +19,7 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
     private final UserService userService;
     private final ModelMapper modelMapper;
-    
+
     @GetMapping
     public String getAllFeedbacksPage(Model model) {
         model.addAttribute("feedbacks", feedbackService.getAllFeedbacks().stream().map(this::convertToEntity).toList());
@@ -32,27 +32,20 @@ public class FeedbackController {
         return "feedback/feedback-details";
     }
 
-    @GetMapping("/save-feedback")
-    public String getSaveFeedbackPage(Model model) {
-        model.addAttribute("feedbackDto", new FeedbackDto());
+    @GetMapping("/save-feedback/{id}")
+    public String getSaveFeedbackPage(Model model, @PathVariable Long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("feedbackDto", id == -1 ? new FeedbackDto() : feedbackService.getFeedbackById(id));
         return "feedback/save-feedback";
     }
 
-    @PostMapping("/save-feedback")
-    public String saveFeedback(@ModelAttribute FeedbackDto feedbackDto) {
-        feedbackService.saveFeedback(feedbackDto);
-        return "redirect:/feedbacks";
-    }
-
-    @GetMapping("/update-feedback/{id}")
-    public String getUpdateFeedbackByIdPage(Model model, @PathVariable Long id) {
-        model.addAttribute("feedbackDto", feedbackService.getFeedbackById(id));
-        return "feedback/update-feedback";
-    }
-
-    @PostMapping("/update-feedback/{id}")
-    public String updateFeedbackById(@ModelAttribute FeedbackDto feedbackDto, @PathVariable Long id) {
-        feedbackService.updateFeedbackById(feedbackDto, id);
+    @PostMapping("/save-feedback/{id}")
+    public String saveFeedback(@ModelAttribute FeedbackDto feedbackDto, @PathVariable Long id) {
+        if (id == -1) {
+            feedbackService.saveFeedback(feedbackDto);
+        } else {
+            feedbackService.updateFeedbackById(feedbackDto, id);
+        }
         return "redirect:/feedbacks";
     }
 

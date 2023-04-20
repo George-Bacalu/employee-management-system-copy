@@ -32,27 +32,20 @@ public class ExperienceController {
         return "experience/experience-details";
     }
 
-    @GetMapping("/save-experience")
-    public String getSaveExperiencePage(Model model) {
-        model.addAttribute("experienceDto", new ExperienceDto());
+    @GetMapping("/save-experience/{id}")
+    public String getSaveExperiencePage(Model model, @PathVariable Long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("experienceDto", id == -1 ? new ExperienceDto() : experienceService.getExperienceById(id));
         return "experience/save-experience";
     }
 
-    @PostMapping("/save-experience")
-    public String saveExperience(@ModelAttribute ExperienceDto experienceDto) {
-        experienceService.saveExperience(experienceDto);
-        return "redirect:/experiences";
-    }
-
-    @GetMapping("/update-experience/{id}")
-    public String getUpdateExperienceByIdPage(Model model, @PathVariable Long id) {
-        model.addAttribute("experienceDto", experienceService.getExperienceById(id));
-        return "experience/update-experience";
-    }
-
-    @PostMapping("/update-experience/{id}")
-    public String updateExperienceById(@ModelAttribute ExperienceDto experienceDto, @PathVariable Long id) {
-        experienceService.updateExperienceById(experienceDto, id);
+    @PostMapping("/save-experience/{id}")
+    public String saveExperience(@ModelAttribute ExperienceDto experienceDto, @PathVariable Long id) {
+        if(id == -1) {
+            experienceService.saveExperience(experienceDto);
+        } else {
+            experienceService.updateExperienceById(experienceDto, id);
+        }
         return "redirect:/experiences";
     }
 

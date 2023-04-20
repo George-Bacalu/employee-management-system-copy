@@ -32,27 +32,20 @@ public class StudiesController {
         return "studies/studies-details";
     }
 
-    @GetMapping("/save-studies")
-    public String getSaveStudiesPage(Model model) {
-        model.addAttribute("studiesDto", new StudiesDto());
+    @GetMapping("/save-studies/{id}")
+    public String getSaveStudiesPage(Model model, @PathVariable Long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("studiesDto", id == -1 ? new StudiesDto() : studiesService.getStudiesById(id));
         return "studies/save-studies";
     }
 
-    @PostMapping("/save-studies")
-    public String saveStudies(@ModelAttribute StudiesDto studiesDto) {
-        studiesService.saveStudies(studiesDto);
-        return "redirect:/studies";
-    }
-
-    @GetMapping("/update-studies/{id}")
-    public String getUpdateStudiesByIdPage(Model model, @PathVariable Long id) {
-        model.addAttribute("studiesDto", studiesService.getStudiesById(id));
-        return "studies/update-studies";
-    }
-
-    @PostMapping("/update-studies/{id}")
-    public String updateStudiesById(@ModelAttribute StudiesDto studiesDto, @PathVariable Long id) {
-        studiesService.updateStudiesById(studiesDto, id);
+    @PostMapping("/save-studies/{id}")
+    public String saveStudies(@ModelAttribute StudiesDto studiesDto, @PathVariable Long id) {
+        if (id == -1) {
+            studiesService.saveStudies(studiesDto);
+        } else {
+            studiesService.updateStudiesById(studiesDto, id);
+        }
         return "redirect:/studies";
     }
 

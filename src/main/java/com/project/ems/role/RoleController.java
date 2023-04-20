@@ -32,27 +32,20 @@ public class RoleController {
         return "role/role-details";
     }
 
-    @GetMapping("/save-role")
-    public String getSaveRolePage(Model model) {
-        model.addAttribute("roleDto", new RoleDto());
+    @GetMapping("/save-role/{id}")
+    public String getSaveRolePage(Model model, @PathVariable Long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("roleDto", id == -1 ? new RoleDto() : roleService.getRoleById(id));
         return "role/save-role";
     }
 
-    @PostMapping("/save-role")
-    public String saveRole(@ModelAttribute RoleDto roleDto) {
-        roleService.saveRole(roleDto);
-        return "redirect:/roles";
-    }
-
-    @GetMapping("/update-role/{id}")
-    public String getUpdateRoleByIdPage(Model model, @PathVariable Long id) {
-        model.addAttribute("roleDto", roleService.getRoleById(id));
-        return "role/update-role";
-    }
-
-    @PostMapping("/update-role/{id}")
-    public String updateRoleById(@ModelAttribute RoleDto roleDto, @PathVariable Long id) {
-        roleService.updateRoleById(roleDto, id);
+    @PostMapping("/save-role/{id}")
+    public String saveRole(@ModelAttribute RoleDto roleDto, @PathVariable Long id) {
+        if (id == -1) {
+            roleService.saveRole(roleDto);
+        } else {
+            roleService.updateRoleById(roleDto, id);
+        }
         return "redirect:/roles";
     }
 

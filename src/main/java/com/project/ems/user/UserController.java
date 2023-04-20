@@ -32,27 +32,20 @@ public class UserController {
         return "user/user-details";
     }
 
-    @GetMapping("/save-user")
-    public String getSaveUserPage(Model model) {
-        model.addAttribute("userDto", new UserDto());
+    @GetMapping("/save-user/{id}")
+    public String getSaveUserPage(Model model, @PathVariable Long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("userDto", id == -1 ? new UserDto() : userService.getUserById(id));
         return "user/save-user";
     }
 
-    @PostMapping("/save-user")
-    public String saveUser(@ModelAttribute UserDto userDto) {
-        userService.saveUser(userDto);
-        return "redirect:/users";
-    }
-
-    @GetMapping("/update-user/{id}")
-    public String getUpdateUserByIdPage(Model model, @PathVariable Long id) {
-        model.addAttribute("userDto", userService.getUserById(id));
-        return "user/update-user";
-    }
-
-    @PostMapping("/update-user/{id}")
-    public String updateUserById(@ModelAttribute UserDto userDto, @PathVariable Long id) {
-        userService.updateUserById(userDto, id);
+    @PostMapping("/save-user/{id}")
+    public String saveUser(@ModelAttribute UserDto userDto, @PathVariable Long id) {
+        if (id == -1) {
+            userService.saveUser(userDto);
+        } else {
+            userService.updateUserById(userDto, id);
+        }
         return "redirect:/users";
     }
 

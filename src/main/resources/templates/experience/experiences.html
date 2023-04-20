@@ -15,7 +15,7 @@
 </header>
 <main style="width: 93%" class="my-2 mx-auto text-left">
   <h1>Experiences List</h1>
-  <a th:href="@{/experiences/save-experience}" class="btn btn-primary my-1">Save Experience</a>
+  <a th:href="@{/experiences/save-experience/-1}" class="btn btn-primary my-1">Save Experience</a>
   <table class="table table-striped table-bordered">
     <thead class="thead-dark">
     <tr>
@@ -35,7 +35,7 @@
       <td th:text="${experience.startedAt}"></td>
       <td th:text="${experience.finishedAt}"></td>
       <td>
-        <a th:href="@{/experiences/update-experience/{id}(id=${experience.id})}" class="btn btn-secondary">Update</a>
+        <a th:href="@{/experiences/save-experience/{id}(id=${experience.id})}" class="btn btn-secondary">Update</a>
         <a th:href="@{/experiences/delete-experience/{id}(id=${experience.id})}" class="btn btn-danger">Delete</a>
         <a th:href="@{/experiences/{id}(id=${experience.id})}" class="btn btn-info">View details</a>
       </td>
