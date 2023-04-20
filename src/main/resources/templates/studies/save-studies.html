@@ -1,18 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Save Studies</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-        crossorigin="anonymous">
-</head>
+<head th:replace="~{/_fragments/layout :: head('Save Studies')}"></head>
 <body>
-<header>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a th:href="@{/employees}" class="navbar-brand p-2">Employee Management System</a>
-  </nav>
-</header>
+<header th:replace="~{/_fragments/layout :: header}"></header>
 <main class="container my-2">
   <div class="card px-4">
     <h1 th:if="${id == -1}" class="text-center">Save Studies</h1>
@@ -34,8 +24,6 @@
     </div>
   </div>
 </main>
-<footer class="text-center text-lg-start bg-dark position-absolute fixed-bottom">
-  <div class="text-white p-3">© Copyright <span th:text="${#dates.year(#dates.createNow())}"></span> - George Bacalu</div>
-</footer>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
 </body>
 </html>
