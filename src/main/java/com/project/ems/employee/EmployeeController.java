@@ -59,7 +59,7 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
-    private Employee convertToEntity(EmployeeDto employeeDto) {
+    public Employee convertToEntity(EmployeeDto employeeDto) {
         Employee employee = modelMapper.map(employeeDto, Employee.class);
         employee.setMentor(mentorService.getMentorEntityById(employeeDto.getMentorId()));
         employee.setStudies(studiesService.getStudiesEntityById(employeeDto.getStudiesId()));
