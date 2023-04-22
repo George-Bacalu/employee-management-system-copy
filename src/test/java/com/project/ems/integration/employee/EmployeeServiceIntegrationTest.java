@@ -109,7 +109,9 @@ class EmployeeServiceIntegrationTest {
 
     @Test
     void getEmployeeById_withInvalidId_shouldThrowException() {
-        assertThatThrownBy(() -> employeeService.getEmployeeById(INVALID_ID)).isInstanceOf(ResourceNotFoundException.class).hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
+        assertThatThrownBy(() -> employeeService.getEmployeeById(INVALID_ID))
+              .isInstanceOf(ResourceNotFoundException.class)
+              .hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
     }
 
     @Test
@@ -147,7 +149,9 @@ class EmployeeServiceIntegrationTest {
 
     @Test
     void updateEmployeeById_withInvalidId_shouldThrowException() {
-        assertThatThrownBy(() -> employeeService.updateEmployeeById(employeeDto2, INVALID_ID)).isInstanceOf(ResourceNotFoundException.class).hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
+        assertThatThrownBy(() -> employeeService.updateEmployeeById(employeeDto2, INVALID_ID))
+              .isInstanceOf(ResourceNotFoundException.class)
+              .hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
         verify(employeeRepository, never()).save(any(Employee.class));
     }
 

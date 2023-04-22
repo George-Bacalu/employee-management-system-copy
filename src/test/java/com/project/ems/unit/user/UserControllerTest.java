@@ -19,6 +19,10 @@ import org.modelmapper.TypeToken;
 import org.springframework.ui.Model;
 
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.REDIRECT_USERS_VIEW;
+import static com.project.ems.constants.Constants.SAVE_USER_VIEW;
+import static com.project.ems.constants.Constants.USERS_VIEW;
+import static com.project.ems.constants.Constants.USER_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.UserMock.getMockedUser1;
@@ -67,7 +71,7 @@ class UserControllerTest {
         given(userService.getAllUsers()).willReturn(userDtos);
         given(model.getAttribute(anyString())).willReturn(users);
         String viewName = userController.getAllUsersPage(model);
-        assertThat(viewName).isEqualTo("user/users");
+        assertThat(viewName).isEqualTo(USERS_VIEW);
         assertThat(model.getAttribute("users")).isEqualTo(users);
     }
 
@@ -76,7 +80,7 @@ class UserControllerTest {
         given(userService.getUserById(anyLong())).willReturn(userDto);
         given(model.getAttribute(anyString())).willReturn(user);
         String viewName = userController.getUserByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("user/user-details");
+        assertThat(viewName).isEqualTo(USER_DETAILS_VIEW);
         assertThat(model.getAttribute("user")).isEqualTo(user);
     }
 
@@ -93,7 +97,7 @@ class UserControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("userDto")).willReturn(new UserDto());
         String viewName = userController.getSaveUserPage(model, -1L);
-        assertThat(viewName).isEqualTo("user/save-user");
+        assertThat(viewName).isEqualTo(SAVE_USER_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("userDto")).isEqualTo(new UserDto());
     }
@@ -104,7 +108,7 @@ class UserControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("userDto")).willReturn(userDto);
         String viewName = userController.getSaveUserPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("user/save-user");
+        assertThat(viewName).isEqualTo(SAVE_USER_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("userDto")).isEqualTo(userDto);
     }
@@ -121,14 +125,14 @@ class UserControllerTest {
     void saveUser_withIdNegative1_shouldSaveUser() {
         String viewName = userController.saveUser(userDto, -1L);
         verify(userService).saveUser(userDto);
-        assertThat(viewName).isEqualTo("redirect:/users");
+        assertThat(viewName).isEqualTo(REDIRECT_USERS_VIEW);
     }
 
     @Test
     void saveUser_withValidId_shouldUpdateUser() {
         String viewName = userController.saveUser(userDto, VALID_ID);
         verify(userService).updateUserById(userDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/users");
+        assertThat(viewName).isEqualTo(REDIRECT_USERS_VIEW);
     }
 
     @Test
@@ -143,7 +147,7 @@ class UserControllerTest {
     void deleteUserById_withValidId_shouldDeleteUser() {
         String viewName = userController.deleteUserById(VALID_ID);
         verify(userService).deleteUserById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/users");
+        assertThat(viewName).isEqualTo(REDIRECT_USERS_VIEW);
     }
 
     @Test

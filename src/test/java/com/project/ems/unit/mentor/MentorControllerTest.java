@@ -18,7 +18,11 @@ import org.modelmapper.TypeToken;
 import org.springframework.ui.Model;
 
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.MENTORS_VIEW;
+import static com.project.ems.constants.Constants.MENTOR_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.MENTOR_NOT_FOUND;
+import static com.project.ems.constants.Constants.REDIRECT_MENTORS_VIEW;
+import static com.project.ems.constants.Constants.SAVE_MENTOR_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.MentorMock.getMockedMentor1;
 import static com.project.ems.mock.MentorMock.getMockedMentors;
@@ -63,7 +67,7 @@ class MentorControllerTest {
         given(mentorService.getAllMentors()).willReturn(mentorDtos);
         given(model.getAttribute(anyString())).willReturn(mentors);
         String viewName = mentorController.getAllMentorsPage(model);
-        assertThat(viewName).isEqualTo("mentor/mentors");
+        assertThat(viewName).isEqualTo(MENTORS_VIEW);
         assertThat(model.getAttribute("mentors")).isEqualTo(mentors);
     }
 
@@ -72,7 +76,7 @@ class MentorControllerTest {
         given(mentorService.getMentorById(anyLong())).willReturn(mentorDto);
         given(model.getAttribute(anyString())).willReturn(mentor);
         String viewName = mentorController.getMentorByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("mentor/mentor-details");
+        assertThat(viewName).isEqualTo(MENTOR_DETAILS_VIEW);
         assertThat(model.getAttribute("mentor")).isEqualTo(mentor);
     }
 
@@ -89,7 +93,7 @@ class MentorControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("mentorDto")).willReturn(new MentorDto());
         String viewName = mentorController.getSaveMentorPage(model, -1L);
-        assertThat(viewName).isEqualTo("mentor/save-mentor");
+        assertThat(viewName).isEqualTo(SAVE_MENTOR_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("mentorDto")).isEqualTo(new MentorDto());
     }
@@ -100,7 +104,7 @@ class MentorControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("mentorDto")).willReturn(mentorDto);
         String viewName = mentorController.getSaveMentorPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("mentor/save-mentor");
+        assertThat(viewName).isEqualTo(SAVE_MENTOR_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("mentorDto")).isEqualTo(mentorDto);
     }
@@ -117,14 +121,14 @@ class MentorControllerTest {
     void saveMentor_withIdNegative1_shouldSaveMentor() {
         String viewName = mentorController.saveMentor(mentorDto, -1L);
         verify(mentorService).saveMentor(mentorDto);
-        assertThat(viewName).isEqualTo("redirect:/mentors");
+        assertThat(viewName).isEqualTo(REDIRECT_MENTORS_VIEW);
     }
 
     @Test
     void saveMentor_withValidId_shouldUpdateMentor() {
         String viewName = mentorController.saveMentor(mentorDto, VALID_ID);
         verify(mentorService).updateMentorById(mentorDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/mentors");
+        assertThat(viewName).isEqualTo(REDIRECT_MENTORS_VIEW);
     }
 
     @Test
@@ -139,7 +143,7 @@ class MentorControllerTest {
     void deleteMentorById_withValidId_shouldDeleteMentor() {
         String viewName = mentorController.deleteMentorById(VALID_ID);
         verify(mentorService).deleteMentorById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/mentors");
+        assertThat(viewName).isEqualTo(REDIRECT_MENTORS_VIEW);
     }
 
     @Test

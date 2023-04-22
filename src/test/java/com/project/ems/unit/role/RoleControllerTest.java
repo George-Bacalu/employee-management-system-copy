@@ -18,7 +18,11 @@ import org.modelmapper.TypeToken;
 import org.springframework.ui.Model;
 
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.REDIRECT_ROLES_VIEW;
+import static com.project.ems.constants.Constants.ROLES_VIEW;
+import static com.project.ems.constants.Constants.ROLE_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.ROLE_NOT_FOUND;
+import static com.project.ems.constants.Constants.SAVE_ROLE_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRoles;
@@ -63,7 +67,7 @@ class RoleControllerTest {
         given(roleService.getAllRoles()).willReturn(roleDtos);
         given(model.getAttribute(anyString())).willReturn(roles);
         String viewName = roleController.getAllRolesPage(model);
-        assertThat(viewName).isEqualTo("role/roles");
+        assertThat(viewName).isEqualTo(ROLES_VIEW);
         assertThat(model.getAttribute("roles")).isEqualTo(roles);
     }
 
@@ -72,7 +76,7 @@ class RoleControllerTest {
         given(roleService.getRoleById(anyLong())).willReturn(roleDto);
         given(model.getAttribute(anyString())).willReturn(role);
         String viewName = roleController.getRoleByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("role/role-details");
+        assertThat(viewName).isEqualTo(ROLE_DETAILS_VIEW);
         assertThat(model.getAttribute("role")).isEqualTo(role);
     }
 
@@ -89,7 +93,7 @@ class RoleControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("roleDto")).willReturn(new RoleDto());
         String viewName = roleController.getSaveRolePage(model, -1L);
-        assertThat(viewName).isEqualTo("role/save-role");
+        assertThat(viewName).isEqualTo(SAVE_ROLE_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("roleDto")).isEqualTo(new RoleDto());
     }
@@ -100,7 +104,7 @@ class RoleControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("roleDto")).willReturn(roleDto);
         String viewName = roleController.getSaveRolePage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("role/save-role");
+        assertThat(viewName).isEqualTo(SAVE_ROLE_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("roleDto")).isEqualTo(roleDto);
     }
@@ -117,14 +121,14 @@ class RoleControllerTest {
     void saveRole_withIdNegative1_shouldSaveRole() {
         String viewName = roleController.saveRole(roleDto, -1L);
         verify(roleService).saveRole(roleDto);
-        assertThat(viewName).isEqualTo("redirect:/roles");
+        assertThat(viewName).isEqualTo(REDIRECT_ROLES_VIEW);
     }
 
     @Test
     void saveRole_withValidId_shouldUpdateRole() {
         String viewName = roleController.saveRole(roleDto, VALID_ID);
         verify(roleService).updateRoleById(roleDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/roles");
+        assertThat(viewName).isEqualTo(REDIRECT_ROLES_VIEW);
     }
 
     @Test
@@ -139,7 +143,7 @@ class RoleControllerTest {
     void deleteRoleById_withValidId_shouldDeleteRole() {
         String viewName = roleController.deleteRoleById(VALID_ID);
         verify(roleService).deleteRoleById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/roles");
+        assertThat(viewName).isEqualTo(REDIRECT_ROLES_VIEW);
     }
 
     @Test

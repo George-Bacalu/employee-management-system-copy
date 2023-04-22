@@ -75,8 +75,7 @@ class EmployeeRestControllerTest {
 
     @Test
     void updateEmployeeById_shouldUpdateEmployeeWithGivenId() {
-        EmployeeDto employeeDto = employeeDto2;
-        employeeDto.setId(VALID_ID);
+        EmployeeDto employeeDto = employeeDto2; employeeDto.setId(VALID_ID);
         given(employeeService.updateEmployeeById(any(EmployeeDto.class), anyLong())).willReturn(employeeDto);
         ResponseEntity<EmployeeDto> response = employeeRestController.updateEmployeeById(employeeDto2, VALID_ID);
         assertNotNull(response);

@@ -17,8 +17,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.ui.Model;
 
+import static com.project.ems.constants.Constants.EXPERIENCES_VIEW;
+import static com.project.ems.constants.Constants.EXPERIENCE_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.REDIRECT_EXPERIENCES_VIEW;
+import static com.project.ems.constants.Constants.SAVE_EXPERIENCE_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
@@ -63,7 +67,7 @@ class ExperienceControllerTest {
         given(experienceService.getAllExperiences()).willReturn(experienceDtos);
         given(model.getAttribute(anyString())).willReturn(experiences);
         String viewName = experienceController.getAllExperiencesPage(model);
-        assertThat(viewName).isEqualTo("experience/experiences");
+        assertThat(viewName).isEqualTo(EXPERIENCES_VIEW);
         assertThat(model.getAttribute("experiences")).isEqualTo(experiences);
     }
 
@@ -72,7 +76,7 @@ class ExperienceControllerTest {
         given(experienceService.getExperienceById(anyLong())).willReturn(experienceDto);
         given(model.getAttribute(anyString())).willReturn(experience);
         String viewName = experienceController.getExperienceByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("experience/experience-details");
+        assertThat(viewName).isEqualTo(EXPERIENCE_DETAILS_VIEW);
         assertThat(model.getAttribute("experience")).isEqualTo(experience);
     }
 
@@ -89,7 +93,7 @@ class ExperienceControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("experienceDto")).willReturn(new ExperienceDto());
         String viewName = experienceController.getSaveExperiencePage(model, -1L);
-        assertThat(viewName).isEqualTo("experience/save-experience");
+        assertThat(viewName).isEqualTo(SAVE_EXPERIENCE_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("experienceDto")).isEqualTo(new ExperienceDto());
     }
@@ -100,7 +104,7 @@ class ExperienceControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("experienceDto")).willReturn(experienceDto);
         String viewName = experienceController.getSaveExperiencePage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("experience/save-experience");
+        assertThat(viewName).isEqualTo(SAVE_EXPERIENCE_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("experienceDto")).isEqualTo(experienceDto);
     }
@@ -117,14 +121,14 @@ class ExperienceControllerTest {
     void saveExperience_withIdNegative1_shouldSaveExperience() {
         String viewName = experienceController.saveExperience(experienceDto, -1L);
         verify(experienceService).saveExperience(experienceDto);
-        assertThat(viewName).isEqualTo("redirect:/experiences");
+        assertThat(viewName).isEqualTo(REDIRECT_EXPERIENCES_VIEW);
     }
 
     @Test
     void saveExperience_withValidId_shouldUpdateExperience() {
         String viewName = experienceController.saveExperience(experienceDto, VALID_ID);
         verify(experienceService).updateExperienceById(experienceDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/experiences");
+        assertThat(viewName).isEqualTo(REDIRECT_EXPERIENCES_VIEW);
     }
 
     @Test
@@ -139,7 +143,7 @@ class ExperienceControllerTest {
     void deleteExperienceById_withValidId_shouldDeleteExperience() {
         String viewName = experienceController.deleteExperienceById(VALID_ID);
         verify(experienceService).deleteExperienceById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/experiences");
+        assertThat(viewName).isEqualTo(REDIRECT_EXPERIENCES_VIEW);
     }
 
     @Test

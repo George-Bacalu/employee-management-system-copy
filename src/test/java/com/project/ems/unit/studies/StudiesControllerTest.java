@@ -18,7 +18,11 @@ import org.modelmapper.TypeToken;
 import org.springframework.ui.Model;
 
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.REDIRECT_STUDIES_VIEW;
+import static com.project.ems.constants.Constants.SAVE_STUDIES_VIEW;
+import static com.project.ems.constants.Constants.STUDIES_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
+import static com.project.ems.constants.Constants.STUDIES_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
 import static com.project.ems.mock.StudiesMock.getMockedStudies1;
@@ -63,7 +67,7 @@ class StudiesControllerTest {
         given(studiesService.getAllStudies()).willReturn(studiesDtos);
         given(model.getAttribute(anyString())).willReturn(studies);
         String viewName = studiesController.getAllStudiesPage(model);
-        assertThat(viewName).isEqualTo("studies/studies");
+        assertThat(viewName).isEqualTo(STUDIES_VIEW);
         assertThat(model.getAttribute("studies")).isEqualTo(studies);
     }
 
@@ -72,7 +76,7 @@ class StudiesControllerTest {
         given(studiesService.getStudiesById(anyLong())).willReturn(studiesDto);
         given(model.getAttribute(anyString())).willReturn(studiesOb);
         String viewName = studiesController.getStudiesByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("studies/studies-details");
+        assertThat(viewName).isEqualTo(STUDIES_DETAILS_VIEW);
         assertThat(model.getAttribute("studies")).isEqualTo(studiesOb);
     }
 
@@ -89,7 +93,7 @@ class StudiesControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("studiesDto")).willReturn(new StudiesDto());
         String viewName = studiesController.getSaveStudiesPage(model, -1L);
-        assertThat(viewName).isEqualTo("studies/save-studies");
+        assertThat(viewName).isEqualTo(SAVE_STUDIES_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("studiesDto")).isEqualTo(new StudiesDto());
     }
@@ -100,7 +104,7 @@ class StudiesControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("studiesDto")).willReturn(studiesDto);
         String viewName = studiesController.getSaveStudiesPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("studies/save-studies");
+        assertThat(viewName).isEqualTo(SAVE_STUDIES_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("studiesDto")).isEqualTo(studiesDto);
     }
@@ -117,14 +121,14 @@ class StudiesControllerTest {
     void saveStudies_withIdNegative1_shouldSaveStudies() {
         String viewName = studiesController.saveStudies(studiesDto, -1L);
         verify(studiesService).saveStudies(studiesDto);
-        assertThat(viewName).isEqualTo("redirect:/studies");
+        assertThat(viewName).isEqualTo(REDIRECT_STUDIES_VIEW);
     }
 
     @Test
     void saveStudies_withValidId_shouldUpdateStudies() {
         String viewName = studiesController.saveStudies(studiesDto, VALID_ID);
         verify(studiesService).updateStudiesById(studiesDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/studies");
+        assertThat(viewName).isEqualTo(REDIRECT_STUDIES_VIEW);
     }
 
     @Test
@@ -139,7 +143,7 @@ class StudiesControllerTest {
     void deleteStudiesById_withValidId_shouldDeleteStudies() {
         String viewName = studiesController.deleteStudiesById(VALID_ID);
         verify(studiesService).deleteStudiesById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/studies");
+        assertThat(viewName).isEqualTo(REDIRECT_STUDIES_VIEW);
     }
 
     @Test

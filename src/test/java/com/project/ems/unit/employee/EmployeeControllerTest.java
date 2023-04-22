@@ -20,8 +20,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.ui.Model;
 
+import static com.project.ems.constants.Constants.EMPLOYEES_VIEW;
+import static com.project.ems.constants.Constants.EMPLOYEE_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.REDIRECT_EMPLOYEES_VIEW;
+import static com.project.ems.constants.Constants.SAVE_EMPLOYEE_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mapper.EmployeeMapper.convertToDto;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
@@ -76,7 +80,7 @@ class EmployeeControllerTest {
         given(employeeService.getAllEmployees()).willReturn(employeeDtos);
         given(model.getAttribute(anyString())).willReturn(employees);
         String viewName = employeeController.getAllEmployeesPage(model);
-        assertThat(viewName).isEqualTo("employee/employees");
+        assertThat(viewName).isEqualTo(EMPLOYEES_VIEW);
         assertThat(model.getAttribute("employees")).isEqualTo(employees);
     }
 
@@ -85,7 +89,7 @@ class EmployeeControllerTest {
         given(employeeService.getEmployeeById(anyLong())).willReturn(employeeDto);
         given(model.getAttribute(anyString())).willReturn(employee);
         String viewName = employeeController.getEmployeeByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("employee/employee-details");
+        assertThat(viewName).isEqualTo(EMPLOYEE_DETAILS_VIEW);
         assertThat(model.getAttribute("employee")).isEqualTo(employee);
     }
 
@@ -102,7 +106,7 @@ class EmployeeControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("employeeDto")).willReturn(new EmployeeDto());
         String viewName = employeeController.getSaveEmployeePage(model, -1L);
-        assertThat(viewName).isEqualTo("employee/save-employee");
+        assertThat(viewName).isEqualTo(SAVE_EMPLOYEE_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("employeeDto")).isEqualTo(new EmployeeDto());
     }
@@ -113,7 +117,7 @@ class EmployeeControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("employeeDto")).willReturn(employeeDto);
         String viewName = employeeController.getSaveEmployeePage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("employee/save-employee");
+        assertThat(viewName).isEqualTo(SAVE_EMPLOYEE_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("employeeDto")).isEqualTo(employeeDto);
     }
@@ -130,14 +134,14 @@ class EmployeeControllerTest {
     void saveEmployee_withIdNegative1_shouldSaveEmployee() {
         String viewName = employeeController.saveEmployee(employeeDto, -1L);
         verify(employeeService).saveEmployee(employeeDto);
-        assertThat(viewName).isEqualTo("redirect:/employees");
+        assertThat(viewName).isEqualTo(REDIRECT_EMPLOYEES_VIEW);
     }
 
     @Test
     void saveEmployee_withValidId_shouldUpdateEmployee() {
         String viewName = employeeController.saveEmployee(employeeDto, VALID_ID);
         verify(employeeService).updateEmployeeById(employeeDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/employees");
+        assertThat(viewName).isEqualTo(REDIRECT_EMPLOYEES_VIEW);
     }
 
     @Test
@@ -152,7 +156,7 @@ class EmployeeControllerTest {
     void deleteEmployeeById_withValidId_shouldDeleteEmployee() {
         String viewName = employeeController.deleteEmployeeById(VALID_ID);
         verify(employeeService).deleteEmployeeById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/employees");
+        assertThat(viewName).isEqualTo(REDIRECT_EMPLOYEES_VIEW);
     }
 
     @Test

@@ -18,8 +18,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.ui.Model;
 
+import static com.project.ems.constants.Constants.FEEDBACKS_VIEW;
+import static com.project.ems.constants.Constants.FEEDBACK_DETAILS_VIEW;
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.REDIRECT_FEEDBACKS_VIEW;
+import static com.project.ems.constants.Constants.SAVE_FEEDBACK_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
@@ -67,7 +71,7 @@ class FeedbackControllerTest {
         given(feedbackService.getAllFeedbacks()).willReturn(feedbackDtos);
         given(model.getAttribute(anyString())).willReturn(feedbacks);
         String viewName = feedbackController.getAllFeedbacksPage(model);
-        assertThat(viewName).isEqualTo("feedback/feedbacks");
+        assertThat(viewName).isEqualTo(FEEDBACKS_VIEW);
         assertThat(model.getAttribute("feedbacks")).isEqualTo(feedbacks);
     }
 
@@ -76,7 +80,7 @@ class FeedbackControllerTest {
         given(feedbackService.getFeedbackById(anyLong())).willReturn(feedbackDto);
         given(model.getAttribute(anyString())).willReturn(feedback);
         String viewName = feedbackController.getFeedbackByIdPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("feedback/feedback-details");
+        assertThat(viewName).isEqualTo(FEEDBACK_DETAILS_VIEW);
         assertThat(model.getAttribute("feedback")).isEqualTo(feedback);
     }
 
@@ -93,7 +97,7 @@ class FeedbackControllerTest {
         given(model.getAttribute("id")).willReturn(-1L);
         given(model.getAttribute("feedbackDto")).willReturn(new FeedbackDto());
         String viewName = feedbackController.getSaveFeedbackPage(model, -1L);
-        assertThat(viewName).isEqualTo("feedback/save-feedback");
+        assertThat(viewName).isEqualTo(SAVE_FEEDBACK_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(-1L);
         assertThat(model.getAttribute("feedbackDto")).isEqualTo(new FeedbackDto());
     }
@@ -104,7 +108,7 @@ class FeedbackControllerTest {
         given(model.getAttribute("id")).willReturn(VALID_ID);
         given(model.getAttribute("feedbackDto")).willReturn(feedbackDto);
         String viewName = feedbackController.getSaveFeedbackPage(model, VALID_ID);
-        assertThat(viewName).isEqualTo("feedback/save-feedback");
+        assertThat(viewName).isEqualTo(SAVE_FEEDBACK_VIEW);
         assertThat(model.getAttribute("id")).isEqualTo(VALID_ID);
         assertThat(model.getAttribute("feedbackDto")).isEqualTo(feedbackDto);
     }
@@ -121,14 +125,14 @@ class FeedbackControllerTest {
     void saveFeedback_withIdNegative1_shouldSaveFeedback() {
         String viewName = feedbackController.saveFeedback(feedbackDto, -1L);
         verify(feedbackService).saveFeedback(feedbackDto);
-        assertThat(viewName).isEqualTo("redirect:/feedbacks");
+        assertThat(viewName).isEqualTo(REDIRECT_FEEDBACKS_VIEW);
     }
 
     @Test
     void saveFeedback_withValidId_shouldUpdateFeedback() {
         String viewName = feedbackController.saveFeedback(feedbackDto, VALID_ID);
         verify(feedbackService).updateFeedbackById(feedbackDto, VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/feedbacks");
+        assertThat(viewName).isEqualTo(REDIRECT_FEEDBACKS_VIEW);
     }
 
     @Test
@@ -143,7 +147,7 @@ class FeedbackControllerTest {
     void deleteFeedbackById_withValidId_shouldDeleteFeedback() {
         String viewName = feedbackController.deleteFeedbackById(VALID_ID);
         verify(feedbackService).deleteFeedbackById(VALID_ID);
-        assertThat(viewName).isEqualTo("redirect:/feedbacks");
+        assertThat(viewName).isEqualTo(REDIRECT_FEEDBACKS_VIEW);
     }
 
     @Test
