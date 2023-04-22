@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Save Experience')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main class="container my-2">
+  <div class="card px-4">
+    <h3 th:if="${id == -1}" class="text-center">Save Experience</h3>
+    <h3 th:unless="${id == -1}" class="text-center">Update Experience</h3>
+    <div class="card-body">
+      <form th:action="@{/experiences/save/{id}(id=${id})}" method="post" th:object="${experienceDto}">
+        <div class="form-group">
+          <label for="title">Title <span class="text-danger font-weight-bold">*</span></label>
+          <input type="text" id="title" th:field="*{title}" placeholder="Enter title" class="form-control" required>
+          <label for="organization" class="mt-3">Organization <span class="text-danger font-weight-bold">*</span></label>
+          <input type="text" id="organization" th:field="*{organization}" placeholder="Enter organization" class="form-control" required>
+          <label for="experience-type" class="mt-3">Experience Type <span class="text-danger font-weight-bold">*</span></label>
+          <select name="experience-type" id="experience-type" th:field="*{experienceType}" class="custom-select form-control" required>
+            <option value="" hidden>---Choose experience type---</option>
+            <option th:each="experienceType : ${T(com.project.ems.experience.enums.ExperienceType).values()}" th:text="${experienceType}" th:value="${experienceType}"></option>
+          </select>
+          <label for="started-at" class="mt-3">Started at <span class="text-danger font-weight-bold">*</span></label>
+          <input type="date" id="started-at" th:field="*{startedAt}" placeholder="Enter started at" class="form-control" required>
+          <label for="finished-at" class="mt-3">Finished at <span class="text-danger font-weight-bold">*</span></label>
+          <input type="date" id="finished-at" th:field="*{finishedAt}" placeholder="Enter finished at" class="form-control" required>
+        </div>
+        <button th:if="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Save</button>
+        <button th:unless="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Update</button>
+        <a th:href="@{/experiences}" type="button" class="btn btn-danger ml-2" style="width: 15%">Cancel</a>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

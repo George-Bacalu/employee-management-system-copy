@@ -112,6 +112,7 @@ class FeedbackServiceImplTest {
         given(clock.getZone()).willReturn(zonedDateTime.getZone());
         given(clock.instant()).willReturn(zonedDateTime.toInstant());
         feedback1.setSentAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0));
+        given(userService.getUserEntityById(anyLong())).willReturn(user1);
         given(feedbackRepository.save(any(Feedback.class))).willReturn(feedback1);
         FeedbackDto result = feedbackService.saveFeedback(feedbackDto1);
         verify(feedbackRepository).save(feedbackCaptor.capture());

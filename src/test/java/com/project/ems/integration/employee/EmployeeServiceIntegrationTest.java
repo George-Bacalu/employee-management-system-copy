@@ -7,6 +7,7 @@ import com.project.ems.employee.EmployeeServiceImpl;
 import com.project.ems.exception.ResourceNotFoundException;
 import com.project.ems.experience.Experience;
 import com.project.ems.experience.ExperienceService;
+import com.project.ems.mapper.EmployeeMapper;
 import com.project.ems.mentor.Mentor;
 import com.project.ems.mentor.MentorService;
 import com.project.ems.studies.Studies;
@@ -17,18 +18,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
-import static com.project.ems.constants.Constants.EXPERIENCE1_IDS;
-import static com.project.ems.constants.Constants.EXPERIENCE2_IDS;
 import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.mapper.EmployeeMapper.convertToDto;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
@@ -64,9 +61,6 @@ class EmployeeServiceIntegrationTest {
     @MockBean
     private ExperienceService experienceService;
 
-    @SpyBean
-    private ModelMapper modelMapper;
-
     @Captor
     private ArgumentCaptor<Employee> employeeCaptor;
 
@@ -94,23 +88,23 @@ class EmployeeServiceIntegrationTest {
         studies2 = getMockedStudies2();
         experiences1 = getMockedExperiences1();
         experiences2 = getMockedExperiences2();
-        employeeDto1 = modelMapper.map(employee1, EmployeeDto.class);
-        employeeDto2 = modelMapper.map(employee2, EmployeeDto.class);
-        employeeDtos = modelMapper.map(employees, new TypeToken<List<EmployeeDto>>() {}.getType());
+        employeeDto1 = convertToDto(employee1);
+        employeeDto2 = convertToDto(employee2);
+        employeeDtos = employees.stream().map(EmployeeMapper::convertToDto).toList();
     }
 
     @Test
     void getAllEmployees_shouldReturnListOfEmployees() {
         given(employeeRepository.findAll()).willReturn(employees);
         List<EmployeeDto> result = employeeService.getAllEmployees();
-        assertThat(result).hasToString(employeeDtos.toString());
+        assertThat(result).isEqualTo(employeeDtos);
     }
 
     @Test
     void getEmployeeById_withValidId_shouldReturnEmployeeWithGivenId() {
         given(employeeRepository.findById(anyLong())).willReturn(Optional.ofNullable(employee1));
         EmployeeDto result = employeeService.getEmployeeById(VALID_ID);
-        assertThat(result).hasToString(employeeDto1.toString());
+        assertThat(result).isEqualTo(employeeDto1);
     }
 
     @Test
@@ -122,13 +116,14 @@ class EmployeeServiceIntegrationTest {
 
     @Test
     void saveEmployee_shouldAddEmployeeToList() {
-        employeeDto1.setExperiencesIds(EXPERIENCE1_IDS);
         employeeDto1.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences1.get((int) (id - 1))));
+        given(mentorService.getMentorEntityById(anyLong())).willReturn(mentor1);
+        given(studiesService.getStudiesEntityById(anyLong())).willReturn(studies1);
         given(employeeRepository.save(any(Employee.class))).willReturn(employee1);
         EmployeeDto result = employeeService.saveEmployee(employeeDto1);
         verify(employeeRepository).save(employeeCaptor.capture());
         Employee savedEmployee = employeeCaptor.getValue();
-        assertThat(result).hasToString(modelMapper.map(savedEmployee, EmployeeDto.class).toString());
+        assertThat(result).isEqualTo(convertToDto(savedEmployee));
         assertThat(savedEmployee.getMentor()).isEqualTo(mentor1);
         assertThat(savedEmployee.getStudies()).isEqualTo(studies1);
         assertThat(savedEmployee.getExperiences()).containsAll(experiences1);
@@ -136,9 +131,9 @@ class EmployeeServiceIntegrationTest {
 
     @Test
     void updateEmployeeById_withValidId_shouldUpdateEmployeeWithGivenId() {
-        employeeDto2.setExperiencesIds(EXPERIENCE2_IDS);
         employeeDto2.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences2.get((int) (id - 3))));
-        Employee employee = employee2; employee.setId(VALID_ID);
+        Employee employee = employee2;
+        employee.setId(VALID_ID);
         given(employeeRepository.findById(anyLong())).willReturn(Optional.ofNullable(employee1));
         given(mentorService.getMentorEntityById(anyLong())).willReturn(mentor2);
         given(studiesService.getStudiesEntityById(anyLong())).willReturn(studies2);
@@ -146,7 +141,7 @@ class EmployeeServiceIntegrationTest {
         EmployeeDto result = employeeService.updateEmployeeById(employeeDto2, VALID_ID);
         verify(employeeRepository).save(employeeCaptor.capture());
         Employee updatedEmployee = employeeCaptor.getValue();
-        assertThat(result).hasToString(modelMapper.map(updatedEmployee, EmployeeDto.class).toString());
+        assertThat(result).isEqualTo(convertToDto(updatedEmployee));
         assertThat(updatedEmployee.getMentor()).isEqualTo(mentor2);
         assertThat(updatedEmployee.getStudies()).isEqualTo(studies2);
         assertThat(updatedEmployee.getExperiences()).containsAll(experiences2);
@@ -169,9 +164,7 @@ class EmployeeServiceIntegrationTest {
 
     @Test
     void deleteEmployeeById_withInvalidId_shouldThrowException() {
-        assertThatThrownBy(() -> employeeService.deleteEmployeeById(INVALID_ID))
-              .isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
+        assertThatThrownBy(() -> employeeService.deleteEmployeeById(INVALID_ID)).isInstanceOf(ResourceNotFoundException.class).hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
         verify(employeeRepository, never()).delete(any(Employee.class));
     }
 }

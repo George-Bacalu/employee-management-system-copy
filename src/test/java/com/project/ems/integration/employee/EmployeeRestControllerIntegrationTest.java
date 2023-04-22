@@ -3,15 +3,13 @@ package com.project.ems.integration.employee;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ems.employee.EmployeeDto;
 import com.project.ems.exception.ErrorResponse;
-import com.project.ems.experience.Experience;
+import com.project.ems.mapper.EmployeeMapper;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -26,6 +24,7 @@ import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
 import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.RESOURCE_NOT_FOUND;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.mapper.EmployeeMapper.convertToDto;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
@@ -51,23 +50,15 @@ class EmployeeRestControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     private EmployeeDto employeeDto1;
     private EmployeeDto employeeDto2;
     private List<EmployeeDto> employeeDtos;
 
     @BeforeEach
     void setUp() {
-        employeeDto1 = modelMapper.map(getMockedEmployee1(), EmployeeDto.class);
-        employeeDto2 = modelMapper.map(getMockedEmployee2(), EmployeeDto.class);
-        employeeDtos = modelMapper.map(getMockedEmployees(), new TypeToken<List<EmployeeDto>>() {
-        }.getType());
-
-        employeeDto1.setExperiencesIds(getMockedEmployee1().getExperiences().stream().map(Experience::getId).toList());
-        employeeDto2.setExperiencesIds(getMockedEmployee2().getExperiences().stream().map(Experience::getId).toList());
-        getMockedEmployees().forEach(employee -> modelMapper.map(employee, EmployeeDto.class).setExperiencesIds(employee.getExperiences().stream().map(Experience::getId).toList()));
+        employeeDto1 = convertToDto(getMockedEmployee1());
+        employeeDto2 = convertToDto(getMockedEmployee2());
+        employeeDtos = getMockedEmployees().stream().map(EmployeeMapper::convertToDto).toList();
     }
 
     @Test
@@ -76,7 +67,7 @@ class EmployeeRestControllerIntegrationTest {
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
-        assertThat(response.getBody()).hasToString(employeeDtos.toString());
+        assertThat(response.getBody()).isEqualTo(employeeDtos);
     }
 
     @Test

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Save Mentor')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main class="container my-2">
+  <div class="card px-4">
+    <h1 th:if="${id == -1}" class="text-center">Save Mentor</h1>
+    <h1 th:unless="${id == -1}" class="text-center">Update Mentor</h1>
+    <div class="card-body">
+      <form th:action="@{/mentors/save/{id}(id=${id})}" method="post" th:object="${mentorDto}">
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label for="name">Name <span class="text-danger font-weight-bold">*</span></label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Enter name" class="form-control" required>
+            <label for="email" class="mt-3">Email <span class="text-danger font-weight-bold">*</span></label>
+            <input type="email" id="email" th:field="*{email}" placeholder="Enter email" class="form-control" required>
+            <label for="mobile" class="mt-3">Mobile <span class="text-danger font-weight-bold">*</span></label>
+            <input type="text" id="mobile" th:field="*{mobile}" placeholder="Enter mobile" class="form-control" required>
+            <label for="address" class="mt-3">Address <span class="text-danger font-weight-bold">*</span></label>
+            <input type="text" id="address" th:field="*{address}" placeholder="Enter address" class="form-control" required>
+          </div>
+          <div class="col-md-6 form-group">
+            <label for="birthday">Birthday <span class="text-danger font-weight-bold">*</span></label>
+            <input type="date" id="birthday" th:field="*{birthday}" placeholder="Enter birthday" class="form-control" required>
+            <label class="mt-3">Available <span class="text-danger font-weight-bold">*</span></label>
+            <div class="btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary"><input type="radio" name="is-available" id="is-available-true" value="true" th:field="*{isAvailable}" required>True</label>
+              <label class="btn btn-secondary"><input type="radio" name="is-available" id="is-available-false" value="false" th:field="*{isAvailable}" required>False</label>
+            </div>
+            <label for="nr-employees" class="mt-3">Nr. employees <span class="text-danger font-weight-bold">*</span></label>
+            <input type="number" id="nr-employees" th:field="*{numberOfEmployees}" placeholder="Enter nr. employees" class="form-control" required>
+          </div>
+        </div>
+        <button th:if="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Save</button>
+        <button th:unless="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Update</button>
+        <a th:href="@{/mentors}" type="button" class="btn btn-danger ml-2" style="width: 15%">Cancel</a>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

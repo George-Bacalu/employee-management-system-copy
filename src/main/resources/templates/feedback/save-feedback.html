@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Save Feedback')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main class="container my-2">
+  <div class="card px-4">
+    <h3 th:if="${id == -1}" class="text-center">Save Feedback</h3>
+    <h3 th:unless="${id == -1}" class="text-center">Update Feedback</h3>
+    <div class="card-body">
+      <form th:action="@{/feedbacks/save/{id}(id=${id})}" method="post" th:object="${feedbackDto}">
+        <div class="form-group">
+          <label for="feedback-type" class="mt-3">Feedback Type <span class="text-danger font-weight-bold">*</span></label>
+          <select name="feedback-type" id="feedback-type" th:field="*{feedbackType}" class="custom-select form-control" required>
+            <option value="" hidden>--- Choose feedback type---</option>
+            <option th:each="feedbackType : ${T(com.project.ems.feedback.enums.FeedbackType).values()}" th:text="${feedbackType}" th:value="${feedbackType}"></option>
+          </select>
+          <label for="description">Description <span class="text-danger font-weight-bold">*</span></label>
+          <textarea rows="3" type="text" id="description" th:field="*{description}" placeholder="Enter description" class="form-control" required></textarea>
+          <label for="user-id" class="mt-3">User ID <span class="text-danger font-weight-bold">*</span></label>
+          <input type="text" id="user-id" th:field="*{userId}" placeholder="Enter user ID" class="form-control" required>
+        </div>
+        <button th:if="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Save</button>
+        <button th:unless="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Update</button>
+        <a th:href="@{/feedbacks}" type="button" class="btn btn-danger ml-2" style="width: 15%">Cancel</a>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

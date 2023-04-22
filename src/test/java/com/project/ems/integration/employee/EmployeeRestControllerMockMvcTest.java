@@ -6,16 +6,13 @@ import com.project.ems.employee.EmployeeDto;
 import com.project.ems.employee.EmployeeRestController;
 import com.project.ems.employee.EmployeeService;
 import com.project.ems.exception.ResourceNotFoundException;
+import com.project.ems.mapper.EmployeeMapper;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,6 +23,7 @@ import static com.project.ems.constants.Constants.EXPERIENCE1_IDS;
 import static com.project.ems.constants.Constants.EXPERIENCE2_IDS;
 import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.mapper.EmployeeMapper.convertToDto;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
@@ -56,25 +54,15 @@ class EmployeeRestControllerMockMvcTest {
     @MockBean
     private EmployeeService employeeService;
 
-    @SpyBean
-    private ModelMapper modelMapper;
-
     private EmployeeDto employeeDto1;
     private EmployeeDto employeeDto2;
     private List<EmployeeDto> employeeDtos;
 
     @BeforeEach
     void setUp() {
-        employeeDto1 = modelMapper.map(getMockedEmployee1(), EmployeeDto.class);
-        employeeDto2 = modelMapper.map(getMockedEmployee2(), EmployeeDto.class);
-        employeeDtos = modelMapper.map(getMockedEmployees(), new TypeToken<List<EmployeeDto>>() {}.getType());
-
-        employeeDto1.setExperiencesIds(EXPERIENCE1_IDS);
-        employeeDto2.setExperiencesIds(EXPERIENCE2_IDS);
-        List<Long> experiencesIds = Stream.concat(EXPERIENCE1_IDS.stream(), EXPERIENCE2_IDS.stream()).toList();
-        for (int i = 0; i < employeeDtos.size(); i++) {
-            employeeDtos.get(i).setExperiencesIds(experiencesIds.subList(i * 2, i * 2 + 2));
-        }
+        employeeDto1 = convertToDto(getMockedEmployee1());
+        employeeDto2 = convertToDto(getMockedEmployee2());
+        employeeDtos = getMockedEmployees().stream().map(EmployeeMapper::convertToDto).toList();
     }
 
     @Test

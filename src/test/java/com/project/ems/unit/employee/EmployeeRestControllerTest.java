@@ -3,20 +3,19 @@ package com.project.ems.unit.employee;
 import com.project.ems.employee.EmployeeDto;
 import com.project.ems.employee.EmployeeRestController;
 import com.project.ems.employee.EmployeeService;
+import com.project.ems.mapper.EmployeeMapper;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.mapper.EmployeeMapper.convertToDto;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
@@ -36,18 +35,15 @@ class EmployeeRestControllerTest {
     @Mock
     private EmployeeService employeeService;
 
-    @Spy
-    private ModelMapper modelMapper;
-
     private EmployeeDto employeeDto1;
     private EmployeeDto employeeDto2;
     private List<EmployeeDto> employeeDtos;
 
     @BeforeEach
     void setUp() {
-        employeeDto1 = modelMapper.map(getMockedEmployee1(), EmployeeDto.class);
-        employeeDto2 = modelMapper.map(getMockedEmployee2(), EmployeeDto.class);
-        employeeDtos = modelMapper.map(getMockedEmployees(), new TypeToken<List<EmployeeDto>>() {}.getType());
+        employeeDto1 = convertToDto(getMockedEmployee1());
+        employeeDto2 = convertToDto(getMockedEmployee2());
+        employeeDtos = getMockedEmployees().stream().map(EmployeeMapper::convertToDto).toList();
     }
 
     @Test

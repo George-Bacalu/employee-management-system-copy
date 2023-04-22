@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Save Studies')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main class="container my-2">
+  <div class="card px-4">
+    <h1 th:if="${id == -1}" class="text-center">Save Studies</h1>
+    <h1 th:unless="${id == -1}" class="text-center">Save Studies</h1>
+    <div class="card-body">
+      <form th:action="@{/studies/save/{id}(id=${id})}" method="post" th:object="${studiesDto}">
+        <div class="form-group">
+          <label for="university">University <span class="text-danger font-weight-bold">*</span></label>
+          <input type="text" id="university" th:field="*{university}" placeholder="Enter university" class="form-control" required>
+          <label for="faculty">Faculty <span class="text-danger font-weight-bold">*</span></label>
+          <input type="text" id="faculty" th:field="*{faculty}" placeholder="Enter faculty" class="form-control" required>
+          <label for="major">Major <span class="text-danger font-weight-bold">*</span></label>
+          <input type="text" id="major" th:field="*{major}" placeholder="Enter major" class="form-control" required>
+        </div>
+        <button th:if="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Save</button>
+        <button th:unless="${id == -1}" type="submit" class="btn btn-success" style="width: 15%">Update</button>
+        <a th:href="@{/studies}" type="button" class="btn btn-danger ml-2" style="width: 15%">Cancel</a>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

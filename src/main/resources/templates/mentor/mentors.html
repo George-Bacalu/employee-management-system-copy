@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Mentors')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main style="width: 93%" class="my-2 mx-auto text-left">
+  <h1>Mentors List</h1>
+  <a th:href="@{/mentors/save/-1}" class="btn btn-primary my-1"><i class="fa-solid fa-plus"></i> Save Mentor</a>
+  <table class="table table-striped table-bordered">
+    <thead class="thead-dark">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Mobile</th>
+      <th>Address</th>
+      <th>Birthday</th>
+      <th>Available</th>
+      <th>Nr. employees</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="mentor: ${mentors}">
+      <td th:text="${mentor.name}"></td>
+      <td th:text="${mentor.email}"></td>
+      <td th:text="${mentor.mobile}"></td>
+      <td th:text="${mentor.address}"></td>
+      <td th:text="${mentor.birthday}"></td>
+      <td th:text="${mentor.isAvailable}"></td>
+      <td th:text="${mentor.numberOfEmployees}"></td>
+      <td>
+        <a th:href="@{/mentors/save/{id}(id=${mentor.id})}" class="btn btn-secondary"><i class="fa-solid fa-pen"></i> Update</a>
+        <a th:href="@{/mentors/delete/{id}(id=${mentor.id})}" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Delete</a>
+        <a th:href="@{/mentors/{id}(id=${mentor.id})}" class="btn btn-info"><i class="fa-solid fa-circle-info"></i> View details</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Users')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main style="width: 93%" class="my-2 mx-auto text-left">
+  <h1>Users List</h1>
+  <a th:href="@{/users/save/-1}" class="btn btn-primary my-1"><i class="fa-solid fa-plus"></i> Save User</a>
+  <table class="table table-striped table-bordered">
+    <thead class="thead-dark">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Mobile</th>
+      <th>Address</th>
+      <th>Birthday</th>
+      <th>Role</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user: ${users}">
+      <td th:text="${user.name}"></td>
+      <td th:text="${user.email}"></td>
+      <td th:text="${user.mobile}"></td>
+      <td th:text="${user.address}"></td>
+      <td th:text="${user.birthday}"></td>
+      <td th:text="${user.role.name}"></td>
+      <td>
+        <a th:href="@{/users/save/{id}(id=${user.id})}" class="btn btn-secondary"><i class="fa-solid fa-pen"></i> Update</a>
+        <a th:href="@{/users/delete/{id}(id=${user.id})}" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Delete</a>
+        <a th:href="@{/users/{id}(id=${user.id})}" class="btn btn-info"><i class="fa-solid fa-circle-info"></i> View details</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

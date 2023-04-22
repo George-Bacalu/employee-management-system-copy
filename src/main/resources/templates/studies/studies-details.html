@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('Studies Details')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main class="my-3 mx-auto w-75">
+  <div class="card px-4">
+    <h1 class="text-center">Studies Details</h1>
+    <div class="card-body">
+      <p>University: <span th:text="${studiesOb.university}"></span></p>
+      <p>Faculty: <span th:text="${studiesOb.faculty}"></span></p>
+      <p>Major: <span th:text="${studiesOb.major}"></span></p>
+      <a th:href="@{/studies}" type="button" class="btn btn-secondary" style="width: 15%">Back</a>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

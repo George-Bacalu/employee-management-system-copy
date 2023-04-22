@@ -99,6 +99,7 @@ class UserServiceImplTest {
 
     @Test
     void saveUser_shouldAddUserToList() {
+        given(roleService.getRoleEntityById(anyLong())).willReturn(role1);
         given(userRepository.save(any(User.class))).willReturn(user1);
         UserDto result = userService.saveUser(userDto1);
         verify(userRepository).save(userCaptor.capture());

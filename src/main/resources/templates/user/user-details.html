@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/_fragments/layout :: head('User Details')}"></head>
+<body>
+<header th:replace="~{/_fragments/layout :: header}"></header>
+<main class="my-3 mx-auto w-75">
+  <div class="card px-4">
+    <h1 class="text-center">User Details</h1>
+    <div class="card-body">
+      <p>Name: <span th:text="${user.name}"></span></p>
+      <p>Email: <span th:text="${user.email}"></span></p>
+      <p>Mobile: <span th:text="${user.mobile}"></span></p>
+      <p>Address: <span th:text="${user.address}"></span></p>
+      <p>Birthday: <span th:text="${user.birthday}"></span></p>
+      <p>Role: <span th:text="${user.role.name}"></span></p>
+      <a th:href="@{/users}" type="button" style="width: 15%" class="btn btn-secondary">Back</a>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{/_fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto saveUser(UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
+        User user = convertToEntity(userDto);
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDto.class);
     }
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(userDto.getPassword());
         user.setMobile(userDto.getMobile());
         user.setAddress(userDto.getAddress());
-        if (user.getBirthday() != null) {
+        if (userDto.getBirthday() != null) {
             user.setBirthday(userDto.getBirthday());
         }
         user.setRole(roleService.getRoleEntityById(userDto.getRoleId()));
@@ -62,5 +62,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserEntityById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+    }
+
+    private User convertToEntity(UserDto userDto) {
+        User user = modelMapper.map(userDto, User.class);
+        user.setRole(roleService.getRoleEntityById(userDto.getRoleId()));
+        return user;
     }
 }
