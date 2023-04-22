@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.project.ems.constants.Constants.REDIRECT_ROLES_VIEW;
+import static com.project.ems.constants.Constants.ROLES_VIEW;
+import static com.project.ems.constants.Constants.ROLE_DETAILS_VIEW;
+import static com.project.ems.constants.Constants.SAVE_ROLE_VIEW;
+
 @Controller
 @RequestMapping("/roles")
 @RequiredArgsConstructor
@@ -23,35 +28,35 @@ public class RoleController {
     @GetMapping
     public String getAllRolesPage(Model model) {
         model.addAttribute("roles", modelMapper.map(roleService.getAllRoles(), new TypeToken<List<Role>>() {}.getType()));
-        return "role/roles";
+        return ROLES_VIEW;
     }
 
     @GetMapping("/{id}")
     public String getRoleByIdPage(Model model, @PathVariable Long id) {
         model.addAttribute("role", modelMapper.map(roleService.getRoleById(id), Role.class));
-        return "role/role-details";
+        return ROLE_DETAILS_VIEW;
     }
 
-    @GetMapping("/save-role/{id}")
+    @GetMapping("/save/{id}")
     public String getSaveRolePage(Model model, @PathVariable Long id) {
         model.addAttribute("id", id);
         model.addAttribute("roleDto", id == -1 ? new RoleDto() : roleService.getRoleById(id));
-        return "role/save-role";
+        return SAVE_ROLE_VIEW;
     }
 
-    @PostMapping("/save-role/{id}")
+    @PostMapping("/save/{id}")
     public String saveRole(@ModelAttribute RoleDto roleDto, @PathVariable Long id) {
         if (id == -1) {
             roleService.saveRole(roleDto);
         } else {
             roleService.updateRoleById(roleDto, id);
         }
-        return "redirect:/roles";
+        return REDIRECT_ROLES_VIEW;
     }
 
-    @GetMapping("/delete-role/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteRoleById(@PathVariable Long id) {
         roleService.deleteRoleById(id);
-        return "redirect:/roles";
+        return REDIRECT_ROLES_VIEW;
     }
 }

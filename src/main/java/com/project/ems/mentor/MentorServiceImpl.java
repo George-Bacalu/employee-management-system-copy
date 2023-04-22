@@ -43,10 +43,10 @@ public class MentorServiceImpl implements MentorService {
         mentor.setPassword(mentorDto.getPassword());
         mentor.setMobile(mentorDto.getMobile());
         mentor.setAddress(mentorDto.getAddress());
-        if (mentor.getBirthday() != null) {
+        if (mentorDto.getBirthday() != null) {
             mentor.setBirthday(mentorDto.getBirthday());
         }
-        if (mentor.getIsAvailable() != null) {
+        if (mentorDto.getIsAvailable() != null) {
             mentor.setIsAvailable(mentorDto.getIsAvailable());
         }
         mentor.setNumberOfEmployees(mentorDto.getNumberOfEmployees());

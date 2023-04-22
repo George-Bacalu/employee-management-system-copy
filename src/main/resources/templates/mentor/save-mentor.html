@@ -8,7 +8,7 @@
     <h1 th:if="${id == -1}" class="text-center">Save Mentor</h1>
     <h1 th:unless="${id == -1}" class="text-center">Update Mentor</h1>
     <div class="card-body">
-      <form th:action="@{/mentors/save-mentor/{id}(id=${id})}" method="post" th:object="${mentorDto}">
+      <form th:action="@{/mentors/save/{id}(id=${id})}" method="post" th:object="${mentorDto}">
         <div class="row">
           <div class="col-md-6 form-group">
             <label for="name">Name <span class="text-danger font-weight-bold">*</span></label>

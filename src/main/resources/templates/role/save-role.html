@@ -8,7 +8,7 @@
     <h1 th:if="${id == -1}" class="text-center">Save Role</h1>
     <h1 th:unless="${id == -1}" class="text-center">Update Role</h1>
     <div class="card-body">
-      <form th:action="@{/roles/save-role/{id}(id=${id})}" method="post" th:object="${roleDto}">
+      <form th:action="@{/roles/save/{id}(id=${id})}" method="post" th:object="${roleDto}">
         <div class="form-group">
           <label for="name">Name <span class="text-danger font-weight-bold">*</span></label>
           <input type="text" id="name" th:field="*{name}" placeholder="Enter name" class="form-control" required>

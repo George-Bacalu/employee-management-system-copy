@@ -8,7 +8,7 @@
     <h3 th:if="${id == -1}" class="text-center">Save Experience</h3>
     <h3 th:unless="${id == -1}" class="text-center">Update Experience</h3>
     <div class="card-body">
-      <form th:action="@{/experiences/save-experience/{id}(id=${id})}" method="post" th:object="${experienceDto}">
+      <form th:action="@{/experiences/save/{id}(id=${id})}" method="post" th:object="${experienceDto}">
         <div class="form-group">
           <label for="title">Title <span class="text-danger font-weight-bold">*</span></label>
           <input type="text" id="title" th:field="*{title}" placeholder="Enter title" class="form-control" required>

@@ -8,7 +8,7 @@
     <h1 th:if="${id == -1}" class="text-center">Save Studies</h1>
     <h1 th:unless="${id == -1}" class="text-center">Save Studies</h1>
     <div class="card-body">
-      <form th:action="@{/studies/save-studies/{id}(id=${id})}" method="post" th:object="${studiesDto}">
+      <form th:action="@{/studies/save/{id}(id=${id})}" method="post" th:object="${studiesDto}">
         <div class="form-group">
           <label for="university">University <span class="text-danger font-weight-bold">*</span></label>
           <input type="text" id="university" th:field="*{university}" placeholder="Enter university" class="form-control" required>

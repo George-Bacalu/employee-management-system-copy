@@ -9,5 +9,4 @@ class EmployeeManagementSystemApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

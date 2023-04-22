@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.project.ems.constants.Constants.REDIRECT_STUDIES_VIEW;
+import static com.project.ems.constants.Constants.SAVE_STUDIES_VIEW;
+import static com.project.ems.constants.Constants.STUDIES_DETAILS_VIEW;
+import static com.project.ems.constants.Constants.STUDIES_VIEW;
+
 @Controller
 @RequestMapping("/studies")
 @RequiredArgsConstructor
@@ -23,35 +28,35 @@ public class StudiesController {
     @GetMapping
     public String getAllStudiesPage(Model model) {
         model.addAttribute("studies", modelMapper.map(studiesService.getAllStudies(), new TypeToken<List<Studies>>() {}.getType()));
-        return "studies/studies";
+        return STUDIES_VIEW;
     }
 
     @GetMapping("/{id}")
     public String getStudiesByIdPage(Model model, @PathVariable Long id) {
         model.addAttribute("studiesOb", modelMapper.map(studiesService.getStudiesById(id), Studies.class));
-        return "studies/studies-details";
+        return STUDIES_DETAILS_VIEW;
     }
 
-    @GetMapping("/save-studies/{id}")
+    @GetMapping("/save/{id}")
     public String getSaveStudiesPage(Model model, @PathVariable Long id) {
         model.addAttribute("id", id);
         model.addAttribute("studiesDto", id == -1 ? new StudiesDto() : studiesService.getStudiesById(id));
-        return "studies/save-studies";
+        return SAVE_STUDIES_VIEW;
     }
 
-    @PostMapping("/save-studies/{id}")
+    @PostMapping("/save/{id}")
     public String saveStudies(@ModelAttribute StudiesDto studiesDto, @PathVariable Long id) {
         if (id == -1) {
             studiesService.saveStudies(studiesDto);
         } else {
             studiesService.updateStudiesById(studiesDto, id);
         }
-        return "redirect:/studies";
+        return REDIRECT_STUDIES_VIEW;
     }
 
-    @GetMapping("/delete-studies/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteStudiesById(@PathVariable Long id) {
         studiesService.deleteStudiesById(id);
-        return "redirect:/studies";
+        return REDIRECT_STUDIES_VIEW;
     }
 }

@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.project.ems.constants.Constants.MENTORS_VIEW;
+import static com.project.ems.constants.Constants.MENTOR_DETAILS_VIEW;
+import static com.project.ems.constants.Constants.REDIRECT_MENTORS_VIEW;
+import static com.project.ems.constants.Constants.SAVE_MENTOR_VIEW;
+
 @Controller
 @RequestMapping("/mentors")
 @RequiredArgsConstructor
@@ -23,35 +28,35 @@ public class MentorController {
     @GetMapping
     public String getAllMentorsPage(Model model) {
         model.addAttribute("mentors", modelMapper.map(mentorService.getAllMentors(), new TypeToken<List<Mentor>>() {}.getType()));
-        return "mentor/mentors";
+        return MENTORS_VIEW;
     }
 
     @GetMapping("/{id}")
     public String getMentorByIdPage(Model model, @PathVariable Long id) {
         model.addAttribute("mentor", modelMapper.map(mentorService.getMentorById(id), Mentor.class));
-        return "mentor/mentor-details";
+        return MENTOR_DETAILS_VIEW;
     }
 
-    @GetMapping("/save-mentor/{id}")
+    @GetMapping("/save/{id}")
     public String getSaveMentorPage(Model model, @PathVariable Long id) {
         model.addAttribute("id", id);
         model.addAttribute("mentorDto", id == -1 ? new MentorDto() : mentorService.getMentorById(id));
-        return "mentor/save-mentor";
+        return SAVE_MENTOR_VIEW;
     }
 
-    @PostMapping("/save-mentor/{id}")
+    @PostMapping("/save/{id}")
     public String saveMentor(@ModelAttribute MentorDto mentorDto, @PathVariable Long id) {
         if (id == -1) {
             mentorService.saveMentor(mentorDto);
         } else {
             mentorService.updateMentorById(mentorDto, id);
         }
-        return "redirect:/mentors";
+        return REDIRECT_MENTORS_VIEW;
     }
 
-    @GetMapping("/delete-mentor/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteMentorById(@PathVariable Long id) {
         mentorService.deleteMentorById(id);
-        return "redirect:/mentors";
+        return REDIRECT_MENTORS_VIEW;
     }
 }

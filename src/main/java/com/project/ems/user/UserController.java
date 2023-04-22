@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.project.ems.constants.Constants.REDIRECT_USERS_VIEW;
+import static com.project.ems.constants.Constants.SAVE_USER_VIEW;
+import static com.project.ems.constants.Constants.USERS_VIEW;
+import static com.project.ems.constants.Constants.USER_DETAILS_VIEW;
+
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -23,36 +28,36 @@ public class UserController {
     @GetMapping
     public String getAllUsersPage(Model model) {
         model.addAttribute("users", userService.getAllUsers().stream().map(this::convertToEntity).toList());
-        return "user/users";
+        return USERS_VIEW;
     }
 
     @GetMapping("/{id}")
     public String getUserByIdPage(Model model, @PathVariable Long id) {
         model.addAttribute("user", convertToEntity(userService.getUserById(id)));
-        return "user/user-details";
+        return USER_DETAILS_VIEW;
     }
 
-    @GetMapping("/save-user/{id}")
+    @GetMapping("/save/{id}")
     public String getSaveUserPage(Model model, @PathVariable Long id) {
         model.addAttribute("id", id);
         model.addAttribute("userDto", id == -1 ? new UserDto() : userService.getUserById(id));
-        return "user/save-user";
+        return SAVE_USER_VIEW;
     }
 
-    @PostMapping("/save-user/{id}")
+    @PostMapping("/save/{id}")
     public String saveUser(@ModelAttribute UserDto userDto, @PathVariable Long id) {
         if (id == -1) {
             userService.saveUser(userDto);
         } else {
             userService.updateUserById(userDto, id);
         }
-        return "redirect:/users";
+        return REDIRECT_USERS_VIEW;
     }
 
-    @GetMapping("/delete-user/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteUserById(@PathVariable Long id) {
         userService.deleteUserById(id);
-        return "redirect:/users";
+        return REDIRECT_USERS_VIEW;
     }
 
     private User convertToEntity(UserDto userDto) {
