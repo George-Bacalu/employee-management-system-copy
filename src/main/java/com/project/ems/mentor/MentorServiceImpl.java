@@ -1,6 +1,7 @@
 package com.project.ems.mentor;
 
 import com.project.ems.exception.ResourceNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,7 +20,7 @@ public class MentorServiceImpl implements MentorService {
     @Override
     public List<MentorDto> getAllMentors() {
         List<Mentor> mentors = mentorRepository.findAll();
-        return modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {}.getType());
+        return !mentors.isEmpty() ? modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {}.getType()) : new ArrayList<>();
     }
 
     @Override

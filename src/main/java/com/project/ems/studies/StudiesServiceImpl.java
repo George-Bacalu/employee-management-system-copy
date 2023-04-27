@@ -1,6 +1,7 @@
 package com.project.ems.studies;
 
 import com.project.ems.exception.ResourceNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,7 +20,7 @@ public class StudiesServiceImpl implements StudiesService {
     @Override
     public List<StudiesDto> getAllStudies() {
         List<Studies> studies = studiesRepository.findAll();
-        return modelMapper.map(studies, new TypeToken<List<StudiesDto>>() {}.getType());
+        return !studies.isEmpty() ? modelMapper.map(studies, new TypeToken<List<StudiesDto>>() {}.getType()) : new ArrayList<>();
     }
 
     @Override

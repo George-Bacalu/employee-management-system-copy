@@ -74,7 +74,6 @@ class EmployeeRestControllerIntegrationTest {
     void getEmployeeById_withValidId_shouldReturnEmployeeWithGivenId() {
         ResponseEntity<EmployeeDto> response = template.getForEntity(API_EMPLOYEES + "/" + VALID_ID, EmployeeDto.class);
         assertNotNull(response);
-        Objects.requireNonNull(response.getBody()).setExperiencesIds(employeeDto1.getExperiencesIds());
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         assertThat(response.getBody()).isEqualTo(employeeDto1);
@@ -99,7 +98,6 @@ class EmployeeRestControllerIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         EmployeeDto result = objectMapper.readValue(response.getBody(), EmployeeDto.class);
-        result.setExperiencesIds(employeeDto1.getExperiencesIds());
         assertThat(result).isEqualTo(employeeDto1);
     }
 
@@ -109,7 +107,6 @@ class EmployeeRestControllerIntegrationTest {
         HttpHeaders headers = new HttpHeaders(); headers.setContentType(APPLICATION_JSON);
         ResponseEntity<EmployeeDto> response = template.exchange(API_EMPLOYEES + "/" + VALID_ID, PUT, new HttpEntity<>(employeeDto2, headers), EmployeeDto.class);
         assertNotNull(response);
-        Objects.requireNonNull(response.getBody()).setExperiencesIds(employeeDto2.getExperiencesIds());
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         assertThat(response.getBody()).isEqualTo(employeeDto);

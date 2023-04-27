@@ -4,6 +4,7 @@ import com.project.ems.exception.ResourceNotFoundException;
 import com.project.ems.user.UserService;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,7 +25,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public List<FeedbackDto> getAllFeedbacks() {
         List<Feedback> feedbacks = feedbackRepository.findAll();
-        return modelMapper.map(feedbacks, new TypeToken<List<FeedbackDto>>() {}.getType());
+        return !feedbacks.isEmpty() ? modelMapper.map(feedbacks, new TypeToken<List<FeedbackDto>>() {}.getType()) : new ArrayList<>();
     }
 
     @Override

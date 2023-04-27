@@ -5,6 +5,7 @@ import com.project.ems.experience.Experience;
 import com.project.ems.experience.ExperienceService;
 import com.project.ems.mentor.MentorService;
 import com.project.ems.studies.StudiesService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeDto> getAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
-        return employees.stream().map(this::convertToDto).toList();
+        return !employees.isEmpty() ? employees.stream().map(this::convertToDto).toList() : new ArrayList<>();
     }
 
     @Override

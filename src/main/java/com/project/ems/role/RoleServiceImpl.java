@@ -1,6 +1,7 @@
 package com.project.ems.role;
 
 import com.project.ems.exception.ResourceNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,7 +20,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleDto> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
-        return modelMapper.map(roles, new TypeToken<List<RoleDto>>() {}.getType());
+        return !roles.isEmpty() ? modelMapper.map(roles, new TypeToken<List<RoleDto>>() {}.getType()) : new ArrayList<>();
     }
 
     @Override

@@ -68,7 +68,8 @@ class EmployeeRestControllerMockMvcTest {
     @Test
     void getAllEmployees_shouldReturnListOfEmployees() throws Exception {
         given(employeeService.getAllEmployees()).willReturn(employeeDtos);
-        ResultActions actions = mockMvc.perform(get(API_EMPLOYEES).accept(APPLICATION_JSON_VALUE)).andExpect(status().isOk());
+        ResultActions actions = mockMvc.perform(get(API_EMPLOYEES).accept(APPLICATION_JSON_VALUE))
+              .andExpect(status().isOk());
         for(EmployeeDto employeeDto : employeeDtos) {
             actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")]").exists());
             actions.andExpect(jsonPath("$[?(@.id == " + employeeDto.getId().intValue() + ")].name").value(employeeDto.getName()));

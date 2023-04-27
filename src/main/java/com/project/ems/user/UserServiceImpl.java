@@ -2,6 +2,7 @@ package com.project.ems.user;
 
 import com.project.ems.exception.ResourceNotFoundException;
 import com.project.ems.role.RoleService;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return modelMapper.map(users, new TypeToken<List<UserDto>>() {}.getType());
+        return !users.isEmpty() ? modelMapper.map(users, new TypeToken<List<UserDto>>() {}.getType()) : new ArrayList<>();
     }
 
     @Override

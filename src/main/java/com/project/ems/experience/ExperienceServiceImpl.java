@@ -1,6 +1,7 @@
 package com.project.ems.experience;
 
 import com.project.ems.exception.ResourceNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,7 +20,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     @Override
     public List<ExperienceDto> getAllExperiences() {
         List<Experience> experiences = experienceRepository.findAll();
-        return modelMapper.map(experiences, new TypeToken<List<ExperienceDto>>() {}.getType());
+        return !experiences.isEmpty() ? modelMapper.map(experiences, new TypeToken<List<ExperienceDto>>() {}.getType()) : new ArrayList<>();
     }
 
     @Override

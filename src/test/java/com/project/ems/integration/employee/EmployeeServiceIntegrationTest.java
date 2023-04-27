@@ -132,8 +132,7 @@ class EmployeeServiceIntegrationTest {
     @Test
     void updateEmployeeById_withValidId_shouldUpdateEmployeeWithGivenId() {
         employeeDto2.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences2.get((int) (id - 3))));
-        Employee employee = employee2;
-        employee.setId(VALID_ID);
+        Employee employee = employee2; employee.setId(VALID_ID);
         given(employeeRepository.findById(anyLong())).willReturn(Optional.ofNullable(employee1));
         given(mentorService.getMentorEntityById(anyLong())).willReturn(mentor2);
         given(studiesService.getStudiesEntityById(anyLong())).willReturn(studies2);

@@ -110,7 +110,7 @@ class FeedbackControllerMockMvcTest {
     @Test
     void getFeedbackByIdPage_withInvalidId_shouldThrowException() throws Exception {
         given(feedbackService.getFeedbackById(INVALID_ID)).willThrow(new ResourceNotFoundException(String.format(FEEDBACK_NOT_FOUND, INVALID_ID)));
-        mockMvc.perform(get("/Feedbacks/{id}", INVALID_ID).accept(TEXT_HTML))
+        mockMvc.perform(get("/feedbacks/{id}", INVALID_ID).accept(TEXT_HTML))
               .andExpect(status().isNotFound());
     }
 
