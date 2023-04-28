@@ -1,6 +1,8 @@
 package com.project.ems.role;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface RoleService {
 
@@ -15,4 +17,6 @@ public interface RoleService {
     void deleteRoleById(Long id);
 
     Role getRoleEntityById(Long id);
+
+    Page<RoleDto> getAllRolesPaginatedSortedFiltered(Pageable pageable, String key);
 }

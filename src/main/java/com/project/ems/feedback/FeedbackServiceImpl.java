@@ -9,6 +9,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
@@ -56,6 +59,15 @@ public class FeedbackServiceImpl implements FeedbackService {
     public void deleteFeedbackById(Long id) {
         Feedback feedback = getFeedbackEntityById(id);
         feedbackRepository.delete(feedback);
+    }
+
+    @Override
+    public Page<FeedbackDto> getAllFeedbacksPaginatedSortedFiltered(Pageable pageable, String key) {
+        key = key.toLowerCase();
+        Page<Feedback> feedbacksPage = key.equals("") ? feedbackRepository.findAll(pageable) : feedbackRepository.findAllByKey(pageable, key);
+        List<Feedback> feedbacks = feedbacksPage.getContent();
+        List<FeedbackDto> feedbackDtos = modelMapper.map(feedbacks, new TypeToken<List<FeedbackDto>>() {}.getType());
+        return new PageImpl<>(feedbackDtos);
     }
 
     private Feedback getFeedbackEntityById(Long id) {

@@ -7,6 +7,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
@@ -63,6 +66,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserEntityById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+    }
+
+    @Override
+    public Page<UserDto> getAllUsersPaginatedSortedFiltered(Pageable pageable, String key) {
+        key = key.toLowerCase();
+        Page<User> usersPage = key.equals("") ? userRepository.findAll(pageable) : userRepository.findAllByKey(pageable, key);
+        List<User> users = usersPage.getContent();
+        List<UserDto> userDtos = modelMapper.map(users, new TypeToken<List<UserDto>>() {}.getType());
+        return new PageImpl<>(userDtos);
     }
 
     private User convertToEntity(UserDto userDto) {

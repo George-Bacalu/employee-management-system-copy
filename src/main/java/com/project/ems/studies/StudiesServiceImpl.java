@@ -6,6 +6,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
@@ -55,5 +58,14 @@ public class StudiesServiceImpl implements StudiesService {
     @Override
     public Studies getStudiesEntityById(Long id) {
         return studiesRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(STUDIES_NOT_FOUND, id)));
+    }
+
+    @Override
+    public Page<StudiesDto> getAllStudiesPaginatedSortedFiltered(Pageable pageable, String key) {
+        key = key.toLowerCase();
+        Page<Studies> studiesPage = key.equals("") ? studiesRepository.findAll(pageable) : studiesRepository.findAllByKey(pageable, key);
+        List<Studies> studies = studiesPage.getContent();
+        List<StudiesDto> studiesDtos = modelMapper.map(studies, new TypeToken<List<StudiesDto>>() {}.getType());
+        return new PageImpl<>(studiesDtos);
     }
 }

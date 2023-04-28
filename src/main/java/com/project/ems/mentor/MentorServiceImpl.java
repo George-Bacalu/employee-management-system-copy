@@ -6,6 +6,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.project.ems.constants.Constants.MENTOR_NOT_FOUND;
@@ -64,5 +67,14 @@ public class MentorServiceImpl implements MentorService {
     @Override
     public Mentor getMentorEntityById(Long id) {
         return mentorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(MENTOR_NOT_FOUND, id)));
+    }
+
+    @Override
+    public Page<MentorDto> getAllMentorsPaginatedSortedFiltered(Pageable pageable, String key) {
+        key = key.toLowerCase();
+        Page<Mentor> mentorsPage = key.equals("") ? mentorRepository.findAll(pageable) : mentorRepository.findAllByKey(pageable, key);
+        List<Mentor> mentors = mentorsPage.getContent();
+        List<MentorDto> mentorDtos = modelMapper.map(mentors, new TypeToken<List<MentorDto>>() {}.getType());
+        return new PageImpl<>(mentorDtos);
     }
 }

@@ -6,6 +6,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.project.ems.constants.Constants.ROLE_NOT_FOUND;
@@ -53,5 +56,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role getRoleEntityById(Long id) {
         return roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(ROLE_NOT_FOUND, id)));
+    }
+
+    @Override
+    public Page<RoleDto> getAllRolesPaginatedSortedFiltered(Pageable pageable, String key) {
+        key = key.toLowerCase();
+        Page<Role> rolesPage = key.equals("") ? roleRepository.findAll(pageable) : roleRepository.findAllByKey(pageable, key);
+        List<Role> roles = rolesPage.getContent();
+        List<RoleDto> roleDtos = modelMapper.map(roles, new TypeToken<List<RoleDto>>() {}.getType());
+        return new PageImpl<>(roleDtos);
     }
 }

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
@@ -68,6 +71,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployeeById(Long id) {
         Employee employee = getEmployeeEntityById(id);
         employeeRepository.delete(employee);
+    }
+
+    @Override
+    public Page<EmployeeDto> getAllEmployeesPaginatedSortedFiltered(Pageable pageable, String key) {
+        key = key.toLowerCase();
+        Page<Employee> employeesPage = key.equals("") ? employeeRepository.findAll(pageable) : employeeRepository.findAllByKey(pageable, key);
+        List<Employee> employees = employeesPage.getContent();
+        List<EmployeeDto> employeeDtos = employees.stream().map(this::convertToDto).toList();
+        return new PageImpl<>(employeeDtos);
     }
 
     private Employee getEmployeeEntityById(Long id) {

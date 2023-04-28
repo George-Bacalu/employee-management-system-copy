@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 public interface ExperienceApi {
@@ -43,4 +45,13 @@ public interface ExperienceApi {
           @ApiResponse(responseCode = "500", description = "Internal server error")},
           parameters = @Parameter(name = "id", description = "ID of experience to delete", example = "1"))
     ResponseEntity<Void> deleteExperienceById(Long id);
+
+    @Operation(summary = "Get all experiences paginated, sorted and filtered", description = "Return a list of experiences paginated, sorted and filtered", tags = {"experience"}, responses = {
+          @ApiResponse(responseCode = "200", description = "Successful operation"),
+          @ApiResponse(responseCode = "404", description = "No experiences found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")},
+          parameters = {
+                @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
+                @Parameter(name = "key", description = "The key to filter by")})
+    ResponseEntity<Page<ExperienceDto>> getAllExperiencesPaginatedSortedFiltered(Pageable pageable, String key);
 }
