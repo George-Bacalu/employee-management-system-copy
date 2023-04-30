@@ -50,8 +50,7 @@ public interface MentorApi {
           @ApiResponse(responseCode = "200", description = "Successful operation"),
           @ApiResponse(responseCode = "404", description = "No mentors found"),
           @ApiResponse(responseCode = "500", description = "Internal server error")},
-          parameters = {
-                @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
-                @Parameter(name = "key", description = "The key to filter by")})
+          parameters = { @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
+                         @Parameter(name = "key", description = "The key to filter by")})
     ResponseEntity<Page<MentorDto>> getAllMentorsPaginatedSortedFiltered(Pageable pageable, String key);
 }

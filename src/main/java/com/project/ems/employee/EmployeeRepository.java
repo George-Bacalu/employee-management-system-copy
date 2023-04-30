@@ -8,18 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    @Query("select employee from Employee employee where " +
-          "lower(employee.name) like %:key% or " +
-          "lower(employee.email) like %:key% or " +
-          "lower(employee.mobile) like %:key% or " +
-          "lower(employee.address) like %:key% or " +
-          "lower(concat('', employee.birthday)) like %:key% or " +
-          "lower(concat('', employee.jobType)) like %:key% or " +
-          "lower(concat('', employee.position)) like %:key% or " +
-          "lower(concat('', employee.grade)) like %:key% or " +
-          "lower(employee.mentor.name) like %:key% or " +
-          "lower(employee.studies.university) like %:key% or " +
-          "lower(employee.studies.faculty) like %:key% or " +
-          "lower(employee.studies.major) like %:key%")
+    @Query("select e from Employee e where lower(concat(e.name, e.email, e.mobile, e.address, e.birthday, e.jobType, e.position, e.grade, e.mentor, e.studies, e.experiences)) like %:key%")
     Page<Employee> findAllByKey(Pageable pageable, @Param("key") String key);
 }

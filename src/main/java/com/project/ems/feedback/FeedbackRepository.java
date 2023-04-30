@@ -8,10 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
-    @Query("select feedback from Feedback feedback where " +
-          "lower(concat('', feedback.feedbackType)) like %:key% or " +
-          "lower(feedback.description) like %:key% or " +
-          "lower(concat('', feedback.description)) like %:key% or " +
-          "lower(feedback.user.name) like %:key%")
+    @Query("select f from Feedback f where lower(concat(f.feedbackType, f.description, f.sentAt, f.user)) like %:key%")
     Page<Feedback> findAllByKey(Pageable pageable, @Param("key") String key);
 }

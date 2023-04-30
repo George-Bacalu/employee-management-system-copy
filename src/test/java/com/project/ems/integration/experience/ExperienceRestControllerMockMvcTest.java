@@ -25,7 +25,7 @@ import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience2;
-import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
+import static com.project.ems.mock.ExperienceMock.getMockedExperiences1_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -63,7 +63,7 @@ class ExperienceRestControllerMockMvcTest {
     void setUp() {
         experienceDto1 = modelMapper.map(getMockedExperience1(), ExperienceDto.class);
         experienceDto2 = modelMapper.map(getMockedExperience2(), ExperienceDto.class);
-        experienceDtos = modelMapper.map(getMockedExperiences1(), new TypeToken<List<ExperienceDto>>() {}.getType());
+        experienceDtos = modelMapper.map(getMockedExperiences1_2(), new TypeToken<List<ExperienceDto>>() {}.getType());
     }
 
     @Test

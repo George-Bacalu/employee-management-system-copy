@@ -25,7 +25,7 @@ import static com.project.ems.constants.Constants.REDIRECT_EXPERIENCES_VIEW;
 import static com.project.ems.constants.Constants.SAVE_EXPERIENCE_VIEW;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
-import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
+import static com.project.ems.mock.ExperienceMock.getMockedExperiences1_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -57,7 +57,7 @@ class ExperienceControllerTest {
     @BeforeEach
     void setUp() {
         experience = getMockedExperience1();
-        experiences = getMockedExperiences1();
+        experiences = getMockedExperiences1_2();
         experienceDto = modelMapper.map(experience, ExperienceDto.class);
         experienceDtos = modelMapper.map(experiences, new TypeToken<List<ExperienceDto>>() {}.getType());
     }

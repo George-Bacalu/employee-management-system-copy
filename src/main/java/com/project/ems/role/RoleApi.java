@@ -50,8 +50,7 @@ public interface RoleApi {
           @ApiResponse(responseCode = "200", description = "Successful operation"),
           @ApiResponse(responseCode = "404", description = "No roles found"),
           @ApiResponse(responseCode = "500", description = "Internal server error")},
-          parameters = {
-                @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
-                @Parameter(name = "key", description = "The key to filter by")})
+          parameters = { @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
+                         @Parameter(name = "key", description = "The key to filter by")})
     ResponseEntity<Page<RoleDto>> getAllRolesPaginatedSortedFiltered(Pageable pageable, String key);
 }

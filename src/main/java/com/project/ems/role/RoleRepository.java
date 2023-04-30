@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    @Query("select role from Role role where lower(role.name) like %:key%")
+    @Query("select r from Role r where lower(r.name) like %:key%")
     Page<Role> findAllByKey(Pageable pageable, @Param("key") String key);
 }

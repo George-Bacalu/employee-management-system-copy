@@ -50,8 +50,7 @@ public interface EmployeeApi {
           @ApiResponse(responseCode = "200", description = "Successful operation"),
           @ApiResponse(responseCode = "404", description = "No employees found"),
           @ApiResponse(responseCode = "500", description = "Internal server error")},
-          parameters = {
-                @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
-                @Parameter(name = "key", description = "The key to filter by")})
+          parameters = { @Parameter(name = "pageable", description = "Pageable object for paging and sorting"),
+                         @Parameter(name = "key", description = "The key to filter by")})
     ResponseEntity<Page<EmployeeDto>> getAllEmployeesPaginatedSortedFiltered(Pageable pageable, String key);
 }

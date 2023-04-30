@@ -26,7 +26,7 @@ import static com.project.ems.constants.Constants.SAVE_EXPERIENCE_VIEW;
 import static com.project.ems.constants.Constants.TEXT_HTML_UTF8;
 import static com.project.ems.constants.Constants.VALID_ID;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
-import static com.project.ems.mock.ExperienceMock.getMockedExperiences1;
+import static com.project.ems.mock.ExperienceMock.getMockedExperiences1_2;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -62,7 +62,7 @@ class ExperienceControllerMockMvcTest {
     @BeforeEach
     void setUp() {
         experience = getMockedExperience1();
-        experiences = getMockedExperiences1();
+        experiences = getMockedExperiences1_2();
         experienceDto = modelMapper.map(experience, ExperienceDto.class);
         experienceDtos = modelMapper.map(experiences, new TypeToken<List<ExperienceDto>>() {}.getType());
     }

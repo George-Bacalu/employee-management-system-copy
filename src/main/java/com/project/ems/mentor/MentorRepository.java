@@ -8,13 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
-    @Query("select mentor from Mentor mentor where " +
-          "lower(mentor.name) like %:key% or " +
-          "lower(mentor.email) like %:key% or " +
-          "lower(mentor.mobile) like %:key% or " +
-          "lower(mentor.address) like %:key% or " +
-          "lower(concat('', mentor.birthday)) like %:key% or " +
-          "lower(concat('', mentor.isAvailable)) like %:key% or " +
-          "concat('', mentor.numberOfEmployees) like %:key%")
+    @Query("select m from Mentor m where lower(concat(m.name, m.email, m.mobile, m.address, m.birthday, m.isAvailable, m.numberOfEmployees)) like %:key%")
     Page<Mentor> findAllByKey(Pageable pageable, @Param("key") String key);
 }

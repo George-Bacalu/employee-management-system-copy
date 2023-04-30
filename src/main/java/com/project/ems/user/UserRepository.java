@@ -8,12 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("select user from User user where " +
-          "lower(user.name) like %:key% or " +
-          "lower(user.email) like %:key% or " +
-          "lower(user.mobile) like %:key% or " +
-          "lower(user.address) like %:key% or " +
-          "lower(concat('', user.birthday)) like %:key% or " +
-          "lower(user.role.name) like %:key%")
+    @Query("select u from User u where lower(concat(u.name, u.email, u.mobile, u.address, u.birthday, u.role)) like %:key%")
     Page<User> findAllByKey(Pageable pageable, @Param("key") String key);
 }
