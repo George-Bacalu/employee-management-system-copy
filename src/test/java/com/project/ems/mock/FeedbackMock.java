@@ -39,6 +39,10 @@ public class FeedbackMock {
               getMockedFeedback12());
     }
 
+    public static List<Feedback> getMockedFilteredFeedbacks() {
+        return List.of(getMockedFeedback1(), getMockedFeedback4(), getMockedFeedback7(), getMockedFeedback10());
+    }
+
     public static Feedback getMockedFeedback1() {
         return Feedback.builder()
               .id(1L)

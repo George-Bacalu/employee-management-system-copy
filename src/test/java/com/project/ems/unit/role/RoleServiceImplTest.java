@@ -18,10 +18,16 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import static com.project.ems.constants.Constants.EMPTY_FILTER_KEY;
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.ROLE_FILTER_KEY;
 import static com.project.ems.constants.Constants.ROLE_NOT_FOUND;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
+import static com.project.ems.mock.RoleMock.getMockedFilteredRoles;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
 import static com.project.ems.mock.RoleMock.getMockedRoles;
@@ -51,18 +57,22 @@ class RoleServiceImplTest {
     private Role role1;
     private Role role2;
     private List<Role> roles;
+    private List<Role> filteredRoles;
     private RoleDto roleDto1;
     private RoleDto roleDto2;
     private List<RoleDto> roleDtos;
+    private List<RoleDto> filteredRoleDtos;
 
     @BeforeEach
     void setUp() {
         role1 = getMockedRole1();
         role2 = getMockedRole2();
         roles = getMockedRoles();
+        filteredRoles = getMockedFilteredRoles();
         roleDto1 = modelMapper.map(role1, RoleDto.class);
         roleDto2 = modelMapper.map(role2, RoleDto.class);
         roleDtos = modelMapper.map(roles, new TypeToken<List<RoleDto>>() {}.getType());
+        filteredRoleDtos = modelMapper.map(filteredRoles, new TypeToken<List<RoleDto>>() {}.getType());
     }
 
     @Test
@@ -125,5 +135,19 @@ class RoleServiceImplTest {
               .isInstanceOf(ResourceNotFoundException.class)
               .hasMessage(String.format(ROLE_NOT_FOUND, INVALID_ID));
         verify(roleRepository, never()).delete(any(Role.class));
+    }
+
+    @Test
+    void getAllRolesPaginatedSortedFiltered_withFilterKey_shouldReturnListOfFilteredRolesPaginatedSorted() {
+        given(roleRepository.findAllByKey(pageable, ROLE_FILTER_KEY)).willReturn(new PageImpl<>(filteredRoles));
+        Page<RoleDto> result = roleService.getAllRolesPaginatedSortedFiltered(pageable, ROLE_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(filteredRoleDtos);
+    }
+
+    @Test
+    void getAllRolesPaginatedSortedFiltered_withoutFilterKey_shouldReturnListOfAllRolesPaginatedSorted() {
+        given(roleRepository.findAll(pageable)).willReturn(new PageImpl<>(roles));
+        Page<RoleDto> result = roleService.getAllRolesPaginatedSortedFiltered(pageable, EMPTY_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(roleDtos);
     }
 }

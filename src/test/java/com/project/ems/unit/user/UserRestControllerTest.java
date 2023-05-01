@@ -13,15 +13,20 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.USER_FILTER_KEY;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
+import static com.project.ems.mock.UserMock.getMockedFilteredUsers;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
 import static com.project.ems.mock.UserMock.getMockedUsers;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -42,12 +47,14 @@ class UserRestControllerTest {
     private UserDto userDto1;
     private UserDto userDto2;
     private List<UserDto> userDtos;
+    private List<UserDto> filteredUserDtos;
 
     @BeforeEach
     void setUp() {
         userDto1 = modelMapper.map(getMockedUser1(), UserDto.class);
         userDto2 = modelMapper.map(getMockedUser2(), UserDto.class);
         userDtos = modelMapper.map(getMockedUsers(), new TypeToken<List<UserDto>>() {}.getType());
+        filteredUserDtos = modelMapper.map(getMockedFilteredUsers(), new TypeToken<List<UserDto>>() {}.getType());
     }
 
     @Test
@@ -93,5 +100,15 @@ class UserRestControllerTest {
         verify(userService).deleteUserById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void getAllUsersPaginatedSortedFiltered_shouldReturnListOfFilteredUsersPaginatedSorted() {
+        Page<UserDto> filteredUserDtosPage = new PageImpl<>(filteredUserDtos);
+        given(userService.getAllUsersPaginatedSortedFiltered(pageable, USER_FILTER_KEY)).willReturn(filteredUserDtosPage);
+        ResponseEntity<Page<UserDto>> response = userRestController.getAllUsersPaginatedSortedFiltered(pageable, USER_FILTER_KEY);
+        assertNotNull(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(filteredUserDtosPage);
     }
 }

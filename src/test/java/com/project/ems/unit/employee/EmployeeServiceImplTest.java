@@ -24,14 +24,20 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import static com.project.ems.constants.Constants.EMPLOYEE_FILTER_KEY;
 import static com.project.ems.constants.Constants.EMPLOYEE_NOT_FOUND;
+import static com.project.ems.constants.Constants.EMPTY_FILTER_KEY;
 import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
 import static com.project.ems.mapper.EmployeeMapper.convertToDto;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee1;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployee2;
 import static com.project.ems.mock.EmployeeMock.getMockedEmployees;
+import static com.project.ems.mock.EmployeeMock.getMockedFilteredEmployees;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences1_2;
 import static com.project.ems.mock.ExperienceMock.getMockedExperiences3_4;
 import static com.project.ems.mock.MentorMock.getMockedMentor1;
@@ -73,30 +79,34 @@ class EmployeeServiceImplTest {
     private Employee employee1;
     private Employee employee2;
     private List<Employee> employees;
+    private List<Employee> filteredEmployees;
     private Mentor mentor1;
     private Mentor mentor2;
     private Studies studies1;
     private Studies studies2;
-    private List<Experience> experiences1;
-    private List<Experience> experiences2;
+    private List<Experience> experiences1_2;
+    private List<Experience> experiences3_4;
     private EmployeeDto employeeDto1;
     private EmployeeDto employeeDto2;
     private List<EmployeeDto> employeeDtos;
+    private List<EmployeeDto> filteredEmployeeDtos;
 
     @BeforeEach
     void setUp() {
         employee1 = getMockedEmployee1();
         employee2 = getMockedEmployee2();
         employees = getMockedEmployees();
+        filteredEmployees = getMockedFilteredEmployees();
         mentor1 = getMockedMentor1();
         mentor2 = getMockedMentor2();
         studies1 = getMockedStudies1();
         studies2 = getMockedStudies2();
-        experiences1 = getMockedExperiences1_2();
-        experiences2 = getMockedExperiences3_4();
+        experiences1_2 = getMockedExperiences1_2();
+        experiences3_4 = getMockedExperiences3_4();
         employeeDto1 = convertToDto(employee1);
         employeeDto2 = convertToDto(employee2);
         employeeDtos = employees.stream().map(EmployeeMapper::convertToDto).toList();
+        filteredEmployeeDtos = filteredEmployees.stream().map(EmployeeMapper::convertToDto).toList();
     }
 
     @Test
@@ -122,7 +132,7 @@ class EmployeeServiceImplTest {
 
     @Test
     void saveEmployee_shouldAddEmployeeToList() {
-        employeeDto1.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences1.get((int) (id - 1))));
+        employeeDto1.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences1_2.get((int) (id - 1))));
         given(mentorService.getMentorEntityById(anyLong())).willReturn(mentor1);
         given(studiesService.getStudiesEntityById(anyLong())).willReturn(studies1);
         given(employeeRepository.save(any(Employee.class))).willReturn(employee1);
@@ -132,14 +142,14 @@ class EmployeeServiceImplTest {
         assertThat(result).isEqualTo(convertToDto(savedEmployee));
         assertThat(savedEmployee.getMentor()).isEqualTo(mentor1);
         assertThat(savedEmployee.getStudies()).isEqualTo(studies1);
-        assertThat(savedEmployee.getExperiences()).containsAll(experiences1);
+        assertThat(savedEmployee.getExperiences()).containsAll(experiences1_2);
     }
 
     @Test
     void updateEmployeeById_withValidId_shouldUpdateEmployeeWithGivenId() {
         Employee employee = employee2; employee.setId(VALID_ID);
         given(employeeRepository.findById(anyLong())).willReturn(Optional.ofNullable(employee1));
-        employeeDto2.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences2.get((int) (id - 3))));
+        employeeDto2.getExperiencesIds().forEach(id -> given(experienceService.getExperienceEntityById(id)).willReturn(experiences3_4.get((int) (id - 3))));
         given(mentorService.getMentorEntityById(anyLong())).willReturn(mentor2);
         given(studiesService.getStudiesEntityById(anyLong())).willReturn(studies2);
         given(employeeRepository.save(any(Employee.class))).willReturn(employee);
@@ -149,7 +159,7 @@ class EmployeeServiceImplTest {
         assertThat(result).isEqualTo(convertToDto(updatedEmployee));
         assertThat(updatedEmployee.getMentor()).isEqualTo(mentor2);
         assertThat(updatedEmployee.getStudies()).isEqualTo(studies2);
-        assertThat(updatedEmployee.getExperiences()).containsAll(experiences2);
+        assertThat(updatedEmployee.getExperiences()).containsAll(experiences3_4);
     }
 
     @Test
@@ -173,5 +183,19 @@ class EmployeeServiceImplTest {
               .isInstanceOf(ResourceNotFoundException.class)
               .hasMessage(String.format(EMPLOYEE_NOT_FOUND, INVALID_ID));
         verify(employeeRepository, never()).delete(any(Employee.class));
+    }
+
+    @Test
+    void getAllEmployeesPaginatedSortedFiltered_withFilterKey_shouldReturnListOfFilteredEmployeesPaginatedSorted() {
+        given(employeeRepository.findAllByKey(pageable, EMPLOYEE_FILTER_KEY)).willReturn(new PageImpl<>(filteredEmployees));
+        Page<EmployeeDto> result = employeeService.getAllEmployeesPaginatedSortedFiltered(pageable, EMPLOYEE_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(filteredEmployeeDtos);
+    }
+
+    @Test
+    void getAllEmployeesPaginatedSortedFiltered_withoutFilterKey_shouldReturnListOfAllEmployeesPaginatedSorted() {
+        given(employeeRepository.findAll(pageable)).willReturn(new PageImpl<>(employees));
+        Page<EmployeeDto> result = employeeService.getAllEmployeesPaginatedSortedFiltered(pageable, EMPTY_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(employeeDtos);
     }
 }

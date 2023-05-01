@@ -13,15 +13,20 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.FEEDBACK_FILTER_KEY;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback2;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
+import static com.project.ems.mock.FeedbackMock.getMockedFilteredFeedbacks;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -42,12 +47,14 @@ class FeedbackRestControllerTest {
     private FeedbackDto feedbackDto1;
     private FeedbackDto feedbackDto2;
     private List<FeedbackDto> feedbackDtos;
+    private List<FeedbackDto> filteredFeedbackDtos;
 
     @BeforeEach
     void setUp() {
         feedbackDto1 = modelMapper.map(getMockedFeedback1(), FeedbackDto.class);
         feedbackDto2 = modelMapper.map(getMockedFeedback2(), FeedbackDto.class);
         feedbackDtos = modelMapper.map(getMockedFeedbacks(), new TypeToken<List<FeedbackDto>>() {}.getType());
+        filteredFeedbackDtos = modelMapper.map(getMockedFilteredFeedbacks(), new TypeToken<List<FeedbackDto>>() {}.getType());
     }
 
     @Test
@@ -93,5 +100,15 @@ class FeedbackRestControllerTest {
         verify(feedbackService).deleteFeedbackById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void getAllFeedbacksPaginatedSortedFiltered_shouldReturnListOfFilteredFeedbacksPaginatedSorted() {
+        Page<FeedbackDto> filteredFeedbackDtosPage = new PageImpl<>(filteredFeedbackDtos);
+        given(feedbackService.getAllFeedbacksPaginatedSortedFiltered(pageable, FEEDBACK_FILTER_KEY)).willReturn(filteredFeedbackDtosPage);
+        ResponseEntity<Page<FeedbackDto>> response = feedbackRestController.getAllFeedbacksPaginatedSortedFiltered(pageable, FEEDBACK_FILTER_KEY);
+        assertNotNull(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(filteredFeedbackDtosPage);
     }
 }

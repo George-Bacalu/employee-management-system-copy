@@ -28,6 +28,10 @@ public class MentorMock {
               getMockedMentor15());
     }
 
+    public static List<Mentor> getMockedFilteredMentors() {
+        return List.of(getMockedMentor1(), getMockedMentor3());
+    }
+
     public static Mentor getMockedMentor1() {
         return Mentor.builder()
               .id(1L)

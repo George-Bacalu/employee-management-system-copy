@@ -18,10 +18,16 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import static com.project.ems.constants.Constants.EMPTY_FILTER_KEY;
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.STUDIES_FILTER_KEY;
 import static com.project.ems.constants.Constants.STUDIES_NOT_FOUND;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
+import static com.project.ems.mock.StudiesMock.getMockedFilteredStudies;
 import static com.project.ems.mock.StudiesMock.getMockedStudies;
 import static com.project.ems.mock.StudiesMock.getMockedStudies1;
 import static com.project.ems.mock.StudiesMock.getMockedStudies2;
@@ -51,18 +57,22 @@ class StudiesServiceImplTest {
     private Studies studies1;
     private Studies studies2;
     private List<Studies> studies;
+    private List<Studies> filteredStudies;
     private StudiesDto studiesDto1;
     private StudiesDto studiesDto2;
     private List<StudiesDto> studiesDtos;
+    private List<StudiesDto> filteredStudiesDtos;
 
     @BeforeEach
     void setUp() {
         studies1 = getMockedStudies1();
         studies2 = getMockedStudies2();
         studies = getMockedStudies();
+        filteredStudies = getMockedFilteredStudies();
         studiesDto1 = modelMapper.map(studies1, StudiesDto.class);
         studiesDto2 = modelMapper.map(studies2, StudiesDto.class);
         studiesDtos = modelMapper.map(studies, new TypeToken<List<StudiesDto>>() {}.getType());
+        filteredStudiesDtos = modelMapper.map(filteredStudies, new TypeToken<List<StudiesDto>>() {}.getType());
     }
 
     @Test
@@ -125,5 +135,19 @@ class StudiesServiceImplTest {
               .isInstanceOf(ResourceNotFoundException.class)
               .hasMessage(String.format(STUDIES_NOT_FOUND, INVALID_ID));
         verify(studiesRepository, never()).delete(any(Studies.class));
+    }
+
+    @Test
+    void getAllStudiesPaginatedSortedFiltered_withFilterKey_shouldReturnListOfFilteredStudiesPaginatedSorted() {
+        given(studiesRepository.findAllByKey(pageable, STUDIES_FILTER_KEY)).willReturn(new PageImpl<>(filteredStudies));
+        Page<StudiesDto> result = studiesService.getAllStudiesPaginatedSortedFiltered(pageable, STUDIES_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(filteredStudiesDtos);
+    }
+
+    @Test
+    void getAllStudiesPaginatedSortedFiltered_withoutFilterKey_shouldReturnListOfAllStudiesPaginatedSorted() {
+        given(studiesRepository.findAll(pageable)).willReturn(new PageImpl<>(studies));
+        Page<StudiesDto> result = studiesService.getAllStudiesPaginatedSortedFiltered(pageable, EMPTY_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(studiesDtos);
     }
 }

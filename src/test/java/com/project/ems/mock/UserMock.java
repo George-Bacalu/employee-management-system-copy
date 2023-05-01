@@ -67,6 +67,10 @@ public class UserMock {
               getMockedUser51());
     }
 
+    public static List<User> getMockedFilteredUsers() {
+        return List.of(getMockedUser1(), getMockedUser3());
+    }
+
     public static User getMockedUser1() {
         return User.builder()
               .id(1L)

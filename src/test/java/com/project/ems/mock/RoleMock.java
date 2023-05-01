@@ -12,6 +12,10 @@ public class RoleMock {
         return List.of(getMockedRole1(), getMockedRole2());
     }
 
+    public static List<Role> getMockedFilteredRoles() {
+        return List.of(getMockedRole1());
+    }
+
     public static Role getMockedRole1() {
         return Role.builder().id(1L).name("USER").build();
     }

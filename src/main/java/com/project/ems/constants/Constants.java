@@ -3,6 +3,9 @@ package com.project.ems.constants;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Constants {
@@ -63,4 +66,22 @@ public class Constants {
     public static final String USER_DETAILS_VIEW = "user/user-details";
     public static final String SAVE_USER_VIEW = "user/save-user";
     public static final String REDIRECT_USERS_VIEW = "redirect:/users";
+
+    public static final Pageable pageable = PageRequest.of(0, 4, Sort.Direction.ASC, "id");
+    public static final String EMPLOYEE_FILTER_KEY = "front";
+    public static final String EXPERIENCE_FILTER_KEY = "intern";
+    public static final String FEEDBACK_FILTER_KEY = "prove";
+    public static final String MENTOR_FILTER_KEY = "john";
+    public static final String ROLE_FILTER_KEY = "adm";
+    public static final String STUDIES_FILTER_KEY = "harvard";
+    public static final String USER_FILTER_KEY = "john";
+    public static final String EMPTY_FILTER_KEY = "";
+
+    public static final String EMPLOYEE_FILTER_QUERY = "select e from Employee e where lower(concat(e.name, '', e.email, '', e.mobile, '', e.address, '', e.birthday, '', e.jobType, '', e.position, '', e.grade, '', e.mentor, '', e.studies)) like %:key%";
+    public static final String EXPERIENCE_FILTER_QUERY = "select e from Experience e where lower(concat(e.title, '', e.organization, '', e.experienceType, '', e.startedAt, '', e.finishedAt)) like %:key%";
+    public static final String FEEDBACK_FILTER_QUERY = "select f from Feedback f where lower(concat(f.feedbackType, '', f.description, '', f.sentAt, '', f.user)) like %:key%";
+    public static final String MENTOR_FILTER_QUERY = "select m from Mentor m where lower(concat(m.name, '', m.email, '', m.mobile, '', m.address, '', m.birthday, '', m.isAvailable, '', m.numberOfEmployees)) like %:key%";
+    public static final String ROLE_FILTER_QUERY = "select r from Role r where lower(r.name) like %:key%";
+    public static final String STUDIES_FILTER_QUERY = "select s from Studies s where lower(concat(s.university, '', s.faculty, '', s.major)) like %:key%";
+    public static final String USER_FILTER_QUERY = "select u from User u where lower(concat(u.name, '', u.email, '', u.mobile, '', u.address, '', u.birthday, '', u.role)) like %:key%";
 }

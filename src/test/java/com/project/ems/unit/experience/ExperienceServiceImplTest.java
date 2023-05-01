@@ -18,13 +18,19 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import static com.project.ems.constants.Constants.EMPTY_FILTER_KEY;
+import static com.project.ems.constants.Constants.EXPERIENCE_FILTER_KEY;
 import static com.project.ems.constants.Constants.EXPERIENCE_NOT_FOUND;
 import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience1;
 import static com.project.ems.mock.ExperienceMock.getMockedExperience2;
-import static com.project.ems.mock.ExperienceMock.getMockedExperiences1_2;
+import static com.project.ems.mock.ExperienceMock.getMockedExperiences;
+import static com.project.ems.mock.ExperienceMock.getMockedFilteredExperiences;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,18 +57,22 @@ class ExperienceServiceImplTest {
     private Experience experience1;
     private Experience experience2;
     private List<Experience> experiences;
+    private List<Experience> filteredExperiences;
     private ExperienceDto experienceDto1;
     private ExperienceDto experienceDto2;
     private List<ExperienceDto> experienceDtos;
+    private List<ExperienceDto> filteredExperienceDtos;
 
     @BeforeEach
     void setUp() {
         experience1 = getMockedExperience1();
         experience2 = getMockedExperience2();
-        experiences = getMockedExperiences1_2();
+        experiences = getMockedExperiences();
+        filteredExperiences = getMockedFilteredExperiences();
         experienceDto1 = modelMapper.map(experience1, ExperienceDto.class);
         experienceDto2 = modelMapper.map(experience2, ExperienceDto.class);
         experienceDtos = modelMapper.map(experiences, new TypeToken<List<ExperienceDto>>() {}.getType());
+        filteredExperienceDtos = modelMapper.map(filteredExperiences, new TypeToken<List<ExperienceDto>>() {}.getType());
     }
 
     @Test
@@ -125,5 +135,19 @@ class ExperienceServiceImplTest {
               .isInstanceOf(ResourceNotFoundException.class)
               .hasMessage(String.format(EXPERIENCE_NOT_FOUND, INVALID_ID));
         verify(experienceRepository, never()).delete(any(Experience.class));
+    }
+
+    @Test
+    void getAllExperiencesPaginatedSortedFiltered_withFilterKey_shouldReturnListOfFilteredExperiencesPaginatedSorted() {
+        given(experienceRepository.findAllByKey(pageable, EXPERIENCE_FILTER_KEY)).willReturn(new PageImpl<>(filteredExperiences));
+        Page<ExperienceDto> result = experienceService.getAllExperiencesPaginatedSortedFiltered(pageable, EXPERIENCE_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(filteredExperienceDtos);
+    }
+
+    @Test
+    void getAllExperiencesPaginatedSortedFiltered_withoutFilterKey_shouldReturnListOfAllExperiencesPaginatedSorted() {
+        given(experienceRepository.findAll(pageable)).willReturn(new PageImpl<>(experiences));
+        Page<ExperienceDto> result = experienceService.getAllExperiencesPaginatedSortedFiltered(pageable, EMPTY_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(experienceDtos);
     }
 }

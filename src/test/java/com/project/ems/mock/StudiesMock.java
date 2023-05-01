@@ -27,6 +27,10 @@ public class StudiesMock {
               getMockedStudies15());
     }
 
+    public static List<Studies> getMockedFilteredStudies() {
+        return List.of(getMockedStudies1(), getMockedStudies15());
+    }
+
     public static Studies getMockedStudies1() {
         return Studies.builder()
               .id(1L)

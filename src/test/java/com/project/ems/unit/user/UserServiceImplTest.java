@@ -20,12 +20,18 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import static com.project.ems.constants.Constants.EMPTY_FILTER_KEY;
 import static com.project.ems.constants.Constants.INVALID_ID;
+import static com.project.ems.constants.Constants.USER_FILTER_KEY;
 import static com.project.ems.constants.Constants.USER_NOT_FOUND;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
+import static com.project.ems.mock.UserMock.getMockedFilteredUsers;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
 import static com.project.ems.mock.UserMock.getMockedUsers;
@@ -58,22 +64,26 @@ class UserServiceImplTest {
     private User user1;
     private User user2;
     private List<User> users;
+    private List<User> filteredUsers;
     private Role role1;
     private Role role2;
     private UserDto userDto1;
     private UserDto userDto2;
     private List<UserDto> userDtos;
+    private List<UserDto> filteredUserDtos;
 
     @BeforeEach
     void setUp() {
         user1 = getMockedUser1();
         user2 = getMockedUser2();
         users = getMockedUsers();
+        filteredUsers = getMockedFilteredUsers();
         role1 = getMockedRole1();
         role2 = getMockedRole2();
         userDto1 = modelMapper.map(user1, UserDto.class);
         userDto2 = modelMapper.map(user2, UserDto.class);
         userDtos = modelMapper.map(users, new TypeToken<List<UserDto>>() {}.getType());
+        filteredUserDtos = modelMapper.map(filteredUsers, new TypeToken<List<UserDto>>() {}.getType());
     }
 
     @Test
@@ -142,5 +152,19 @@ class UserServiceImplTest {
               .isInstanceOf(ResourceNotFoundException.class)
               .hasMessage(String.format(USER_NOT_FOUND, INVALID_ID));
         verify(userRepository, never()).delete(any(User.class));
+    }
+
+    @Test
+    void getAllUsersPaginatedSortedFiltered_withFilterKey_shouldReturnListOfFilteredUsersPaginatedSorted() {
+        given(userRepository.findAllByKey(pageable, USER_FILTER_KEY)).willReturn(new PageImpl<>(filteredUsers));
+        Page<UserDto> result = userService.getAllUsersPaginatedSortedFiltered(pageable, USER_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(filteredUserDtos);
+    }
+
+    @Test
+    void getAllUsersPaginatedSortedFiltered_withoutFilterKey_shouldReturnListOfAllUsersPaginatedSorted() {
+        given(userRepository.findAll(pageable)).willReturn(new PageImpl<>(users));
+        Page<UserDto> result = userService.getAllUsersPaginatedSortedFiltered(pageable, EMPTY_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(userDtos);
     }
 }

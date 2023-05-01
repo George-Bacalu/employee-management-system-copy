@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    @Query("select e from Employee e where lower(concat(e.name, e.email, e.mobile, e.address, e.birthday, e.jobType, e.position, e.grade, e.mentor, e.studies, e.experiences)) like %:key%")
+    @Query("select e from Employee e where lower(concat(e.name, '', e.email, '', e.mobile, '', e.address, '', e.birthday, '', e.jobType, '', e.position, '', e.grade, '', e.mentor, '', e.studies)) like %:key%")
     Page<Employee> findAllByKey(Pageable pageable, @Param("key") String key);
 }

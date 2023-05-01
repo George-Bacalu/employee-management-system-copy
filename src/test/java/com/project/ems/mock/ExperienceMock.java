@@ -26,6 +26,10 @@ public class ExperienceMock {
               .toList();
     }
 
+    public static List<Experience> getMockedFilteredExperiences() {
+        return List.of(getMockedExperience1(), getMockedExperience2(), getMockedExperience3(), getMockedExperience4());
+    }
+
     public static List<Experience> getMockedExperiences1_2() {
         return List.of(getMockedExperience1(), getMockedExperience2());
     }

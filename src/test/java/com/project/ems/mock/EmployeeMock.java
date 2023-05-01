@@ -91,6 +91,10 @@ public class EmployeeMock {
               getMockedEmployee36());
     }
 
+    public static List<Employee> getMockedFilteredEmployees() {
+        return List.of(getMockedEmployee1(), getMockedEmployee2(), getMockedEmployee3(), getMockedEmployee4());
+    }
+
     public static Employee getMockedEmployee1() {
         return Employee.builder()
               .id(1L)

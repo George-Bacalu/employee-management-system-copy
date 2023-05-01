@@ -24,13 +24,19 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import static com.project.ems.constants.Constants.EMPTY_FILTER_KEY;
+import static com.project.ems.constants.Constants.FEEDBACK_FILTER_KEY;
 import static com.project.ems.constants.Constants.FEEDBACK_NOT_FOUND;
 import static com.project.ems.constants.Constants.INVALID_ID;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback1;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedback2;
 import static com.project.ems.mock.FeedbackMock.getMockedFeedbacks;
+import static com.project.ems.mock.FeedbackMock.getMockedFilteredFeedbacks;
 import static com.project.ems.mock.UserMock.getMockedUser1;
 import static com.project.ems.mock.UserMock.getMockedUser2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,22 +74,26 @@ class FeedbackServiceImplTest {
     private Feedback feedback1;
     private Feedback feedback2;
     private List<Feedback> feedbacks;
+    private List<Feedback> filteredFeedbacks;
     private User user1;
     private User user2;
     private FeedbackDto feedbackDto1;
     private FeedbackDto feedbackDto2;
     private List<FeedbackDto> feedbackDtos;
+    private List<FeedbackDto> filteredFeedbackDtos;
 
     @BeforeEach
     void setUp() {
         feedback1 = getMockedFeedback1();
         feedback2 = getMockedFeedback2();
         feedbacks = getMockedFeedbacks();
+        filteredFeedbacks = getMockedFilteredFeedbacks();
         user1 = getMockedUser1();
         user2 = getMockedUser2();
         feedbackDto1 = modelMapper.map(feedback1, FeedbackDto.class);
         feedbackDto2 = modelMapper.map(feedback2, FeedbackDto.class);
         feedbackDtos = modelMapper.map(feedbacks, new TypeToken<List<FeedbackDto>>() {}.getType());
+        filteredFeedbackDtos = modelMapper.map(filteredFeedbacks, new TypeToken<List<FeedbackDto>>() {}.getType());
     }
 
     @Test
@@ -156,5 +166,19 @@ class FeedbackServiceImplTest {
               .isInstanceOf(ResourceNotFoundException.class)
               .hasMessage(String.format(FEEDBACK_NOT_FOUND, INVALID_ID));
         verify(feedbackRepository, never()).delete(any(Feedback.class));
+    }
+
+    @Test
+    void getAllFeedbacksPaginatedSortedFiltered_withFilterKey_shouldReturnListOfFilteredFeedbacksPaginatedSorted() {
+        given(feedbackRepository.findAllByKey(pageable, FEEDBACK_FILTER_KEY)).willReturn(new PageImpl<>(filteredFeedbacks));
+        Page<FeedbackDto> result = feedbackService.getAllFeedbacksPaginatedSortedFiltered(pageable, FEEDBACK_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(filteredFeedbackDtos);
+    }
+
+    @Test
+    void getAllFeedbacksPaginatedSortedFiltered_withoutFilterKey_shouldReturnListOfAllFeedbacksPaginatedSorted() {
+        given(feedbackRepository.findAll(pageable)).willReturn(new PageImpl<>(feedbacks));
+        Page<FeedbackDto> result = feedbackService.getAllFeedbacksPaginatedSortedFiltered(pageable, EMPTY_FILTER_KEY);
+        assertThat(result.getContent()).isEqualTo(feedbackDtos);
     }
 }

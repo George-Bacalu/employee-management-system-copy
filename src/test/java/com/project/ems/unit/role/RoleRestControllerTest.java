@@ -13,10 +13,14 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.project.ems.constants.Constants.ROLE_FILTER_KEY;
 import static com.project.ems.constants.Constants.VALID_ID;
+import static com.project.ems.constants.Constants.pageable;
 import static com.project.ems.mock.RoleMock.getMockedRole1;
 import static com.project.ems.mock.RoleMock.getMockedRole2;
 import static com.project.ems.mock.RoleMock.getMockedRoles;
@@ -93,5 +97,15 @@ class RoleRestControllerTest {
         verify(roleService).deleteRoleById(VALID_ID);
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void getAllRolesPaginatedSortedFiltered_shouldReturnListOfFilteredRolesPaginatedSorted() {
+        Page<RoleDto> filteredRoleDtosPage = new PageImpl<>(List.of(roleDto1));
+        given(roleService.getAllRolesPaginatedSortedFiltered(pageable, ROLE_FILTER_KEY)).willReturn(filteredRoleDtosPage);
+        ResponseEntity<Page<RoleDto>> response = roleRestController.getAllRolesPaginatedSortedFiltered(pageable, ROLE_FILTER_KEY);
+        assertNotNull(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(filteredRoleDtosPage);
     }
 }
